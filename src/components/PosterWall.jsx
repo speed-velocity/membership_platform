@@ -33,7 +33,7 @@ function chunk(list, cols) {
 }
 
 export default function PosterWall() {
-  const columns = chunk(posters, 5);
+  const columns = chunk(posters, 7);
   return (
     <div className="poster-wall" aria-hidden="true">
       {columns.map((col, cIdx) => (
