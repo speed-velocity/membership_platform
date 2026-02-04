@@ -22,7 +22,12 @@ if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 if (!fs.existsSync(path.join(uploadsDir, 'content'))) fs.mkdirSync(path.join(uploadsDir, 'content'), { recursive: true });
 
-app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:5174'], credentials: true }));
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'https://membership-platform-ochre.vercel.app',
+];
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
