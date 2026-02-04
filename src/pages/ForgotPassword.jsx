@@ -9,22 +9,22 @@ export default function ForgotPassword() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const res = await fetch(`${API}/auth/forgot-password`, {
+      const res = await fetch(`${API}/auth/direct-reset`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, password, confirmPassword }),
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to send reset email');
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to send reset email');
       setSent(true);
     } catch (err) {
       setError(err.message);
@@ -37,10 +37,10 @@ export default function ForgotPassword() {
     <div className="auth-page">
       <div className="auth-card glass-card animate-fade-in">
         <h1 className="auth-title">Reset Password</h1>
-        <p className="auth-subtitle">We’ll send a reset link to your email.</p>
+        <p className="auth-subtitle">Enter your email and set a new password.</p>
         <form onSubmit={handleSubmit} className="auth-form">
           {error && <div className="auth-error">{error}</div>}
-          {sent && <div className="auth-success">If that email exists, a reset link was sent.</div>}
+          {sent && <div className="auth-success">Password updated. You can sign in now.</div>}
           <input
             type="email"
             placeholder="Email"
@@ -48,8 +48,24 @@ export default function ForgotPassword() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          <input
+            type="password"
+            placeholder="New password (min 6 characters)"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            minLength={6}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Confirm new password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            minLength={6}
+            required
+          />
           <button type="submit" className="btn-glow btn-primary" disabled={loading}>
-            {loading ? 'Sending...' : 'Send Reset Link'}
+            {loading ? 'Updating...' : 'Update Password'}
           </button>
         </form>
         <p className="auth-footer">

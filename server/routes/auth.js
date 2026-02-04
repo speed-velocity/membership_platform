@@ -112,12 +112,36 @@ router.post('/forgot-password', async (req, res) => {
       'INSERT INTO password_resets (user_id, token_hash, expires_at) VALUES (?, ?, ?)'
     ).run(user.id, tokenHash, expiresAt);
     const resetLink = `${config.appUrl}/reset-password?token=${token}`;
-    await sendEmail(
+    const sent = await sendEmail(
       user.email,
       'Reset your password',
       `Click to reset your password: ${resetLink}\nThis link expires in 1 hour.`,
       `Click to reset your password: ${resetLink}<br>This link expires in 1 hour.`
     );
+    if (config.showResetLink) {
+      return res.json({ ok: true, resetLink, sent });
+    }
+  }
+  // Always respond ok to avoid user enumeration
+  res.json({ ok: true });
+});
+
+// Insecure direct reset (no email). Use only if you accept the risk.
+router.post('/direct-reset', (req, res) => {
+  const { email, password, confirmPassword } = req.body || {};
+  if (!email || !password || !confirmPassword) {
+    return res.status(400).json({ error: 'Email and passwords required' });
+  }
+  if (password !== confirmPassword) {
+    return res.status(400).json({ error: 'Passwords do not match' });
+  }
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+  }
+  const user = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+  if (user) {
+    const hashed = bcrypt.hashSync(password, 10);
+    db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hashed, user.id);
   }
   // Always respond ok to avoid user enumeration
   res.json({ ok: true });
