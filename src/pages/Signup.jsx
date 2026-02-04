@@ -30,6 +30,7 @@ export default function Signup() {
   return (
     <div className="auth-page">
       <div className="auth-card glass-card animate-fade-in">
+        <div className="brand-mark">Movie Mayhem</div>
         <h1 className="auth-title">Join the Experience</h1>
         <p className="auth-subtitle">Create your membership account</p>
         <form onSubmit={handleSubmit} className="auth-form">

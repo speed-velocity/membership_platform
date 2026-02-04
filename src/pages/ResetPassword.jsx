@@ -39,6 +39,7 @@ export default function ResetPassword() {
   return (
     <div className="auth-page">
       <div className="auth-card glass-card animate-fade-in">
+        <div className="brand-mark">Movie Mayhem</div>
         <h1 className="auth-title">Set New Password</h1>
         <p className="auth-subtitle">Choose a new password for your account.</p>
         <form onSubmit={handleSubmit} className="auth-form">

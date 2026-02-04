@@ -4,12 +4,53 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  position: relative;
+  perspective: 900px;
 }
 
 .auth-card {
   width: 100%;
   max-width: 420px;
   padding: 2.5rem;
+  transform-style: preserve-3d;
+  animation: auth-float 7s ease-in-out infinite;
+}
+
+.auth-page::before {
+  content: '';
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(127, 43, 255, 0.35), transparent 60%);
+  filter: blur(30px);
+  top: 10%;
+  right: 12%;
+  animation: orb-drift 10s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.auth-page::after {
+  content: '';
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transform: rotateZ(12deg);
+  top: 12%;
+  left: 10%;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+  animation: frame-tilt 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.brand-mark {
+  font-size: 0.85rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.75rem;
 }
 
 .auth-title {
@@ -55,4 +96,19 @@
   margin-top: 1.5rem;
   text-align: center;
   color: var(--text-muted);
+}
+
+@keyframes auth-float {
+  0%, 100% { transform: translateY(0) rotateX(0deg); }
+  50% { transform: translateY(-6px) rotateX(1deg); }
+}
+
+@keyframes orb-drift {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-30px, 20px, 0); }
+}
+
+@keyframes frame-tilt {
+  0%, 100% { transform: rotateZ(12deg) rotateX(0deg); opacity: 0.4; }
+  50% { transform: rotateZ(10deg) rotateX(3deg); opacity: 0.55; }
 }

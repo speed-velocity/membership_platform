@@ -36,6 +36,7 @@ export default function ForgotPassword() {
   return (
     <div className="auth-page">
       <div className="auth-card glass-card animate-fade-in">
+        <div className="brand-mark">Movie Mayhem</div>
         <h1 className="auth-title">Reset Password</h1>
         <p className="auth-subtitle">Enter your email and set a new password.</p>
         <form onSubmit={handleSubmit} className="auth-form">
