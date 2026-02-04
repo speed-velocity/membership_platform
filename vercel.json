@@ -3,6 +3,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://membership-platform-api.onrender.com/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
     }
   ]
 }
