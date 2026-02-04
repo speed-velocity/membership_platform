@@ -22,6 +22,15 @@ const posters = [
   'download (8).jpg',
   'download (9).jpg',
   'download (10).jpg',
+  'download (11).jpg',
+  'download (12).jpg',
+  'download (13).jpg',
+  'download (14).jpg',
+  'download (15).jpg',
+  'download (16).jpg',
+  'download (17).jpg',
+  'download (18).jpg',
+  'images (2).jpg',
 ];
 
 const sizes = ['tall', 'short', '', '', 'tall', '', 'short', '', ''];
