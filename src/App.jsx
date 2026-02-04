@@ -4,6 +4,8 @@ import { useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Payment from './pages/Payment';
 import Dashboard from './pages/Dashboard';
 import Content from './pages/Content';
@@ -16,6 +18,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminContent from './pages/admin/AdminContent';
 import AdminRequests from './pages/admin/AdminRequests';
 import AdminSettings from './pages/admin/AdminSettings';
+import AdminLogins from './pages/admin/AdminLogins';
 
 function ProtectedRoute({ children, adminOnly }) {
   const { user, loading } = useAuth();
@@ -30,6 +33,8 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/" element={<Layout />}>
         <Route index element={<Navigate to="/dashboard" replace />} />
@@ -43,6 +48,7 @@ export default function App() {
         <Route path="admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
         <Route path="admin/content" element={<ProtectedRoute adminOnly><AdminContent /></ProtectedRoute>} />
         <Route path="admin/requests" element={<ProtectedRoute adminOnly><AdminRequests /></ProtectedRoute>} />
+        <Route path="admin/logins" element={<ProtectedRoute adminOnly><AdminLogins /></ProtectedRoute>} />
         <Route path="admin/settings" element={<ProtectedRoute adminOnly><AdminSettings /></ProtectedRoute>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

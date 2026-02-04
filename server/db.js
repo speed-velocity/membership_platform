@@ -117,11 +117,23 @@ mod.initDb = async function () {
       value TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS password_resets (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      token_hash TEXT NOT NULL,
+      expires_at DATETIME NOT NULL,
+      used INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+
     CREATE INDEX IF NOT EXISTS idx_subscriptions_user ON subscriptions(user_id);
     CREATE INDEX IF NOT EXISTS idx_movie_requests_user ON movie_requests(user_id);
     CREATE INDEX IF NOT EXISTS idx_movie_requests_created ON movie_requests(created_at);
     CREATE INDEX IF NOT EXISTS idx_login_history_user ON login_history(user_id);
     CREATE INDEX IF NOT EXISTS idx_login_history_created ON login_history(created_at);
+    CREATE INDEX IF NOT EXISTS idx_password_resets_user ON password_resets(user_id);
+    CREATE INDEX IF NOT EXISTS idx_password_resets_token ON password_resets(token_hash);
   `);
 
   // Ensure users.last_login/full_name/telegram_username exist

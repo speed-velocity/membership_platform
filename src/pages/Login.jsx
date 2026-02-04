@@ -64,6 +64,9 @@ export default function Login() {
           {' · '}
           <Link to="/admin/login">Admin login</Link>
         </p>
+        <p className="auth-footer">
+          <Link to="/forgot-password">Forgot password?</Link>
+        </p>
       </div>
     </div>
   );

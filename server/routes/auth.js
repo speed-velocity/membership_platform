@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
 const { authMiddleware, JWT_SECRET } = require('../middleware/auth');
@@ -95,6 +96,49 @@ router.post('/admin-login', (req, res) => {
 
 router.post('/logout', (req, res) => {
   res.clearCookie('token');
+  res.json({ ok: true });
+});
+
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body || {};
+  if (!email) return res.status(400).json({ error: 'Email required' });
+  const user = db.prepare('SELECT id, email FROM users WHERE email = ?').get(email);
+  if (user) {
+    const token = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 60).toISOString();
+    db.prepare('DELETE FROM password_resets WHERE user_id = ?').run(user.id);
+    db.prepare(
+      'INSERT INTO password_resets (user_id, token_hash, expires_at) VALUES (?, ?, ?)'
+    ).run(user.id, tokenHash, expiresAt);
+    const resetLink = `${config.appUrl}/reset-password?token=${token}`;
+    await sendEmail(
+      user.email,
+      'Reset your password',
+      `Click to reset your password: ${resetLink}\nThis link expires in 1 hour.`,
+      `Click to reset your password: ${resetLink}<br>This link expires in 1 hour.`
+    );
+  }
+  // Always respond ok to avoid user enumeration
+  res.json({ ok: true });
+});
+
+router.post('/reset-password', (req, res) => {
+  const { token, password } = req.body || {};
+  if (!token || !password) return res.status(400).json({ error: 'Token and password required' });
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+  }
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+  const reset = db.prepare(`
+    SELECT id, user_id FROM password_resets
+    WHERE token_hash = ? AND used = 0 AND expires_at > datetime('now')
+    ORDER BY id DESC LIMIT 1
+  `).get(tokenHash);
+  if (!reset) return res.status(400).json({ error: 'Invalid or expired token' });
+  const hashed = bcrypt.hashSync(password, 10);
+  db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hashed, reset.user_id);
+  db.prepare('UPDATE password_resets SET used = 1 WHERE id = ?').run(reset.id);
   res.json({ ok: true });
 });
 

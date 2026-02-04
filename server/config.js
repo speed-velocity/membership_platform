@@ -11,4 +11,5 @@ module.exports = {
     pass: process.env.SMTP_PASS || '',
   },
   notificationEmail: process.env.NOTIFICATION_EMAIL || process.env.ADMIN_EMAIL || 'admin@platform.com',
+  appUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
 };
