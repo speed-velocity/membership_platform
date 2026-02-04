@@ -1,0 +1,51 @@
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+import Layout from './components/Layout';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Payment from './pages/Payment';
+import Dashboard from './pages/Dashboard';
+import Content from './pages/Content';
+import ContentPlayer from './pages/ContentPlayer';
+import MovieRequests from './pages/MovieRequests';
+import AdminLogin from './pages/admin/AdminLogin';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminSubscriptions from './pages/admin/AdminSubscriptions';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminContent from './pages/admin/AdminContent';
+import AdminRequests from './pages/admin/AdminRequests';
+import AdminSettings from './pages/admin/AdminSettings';
+
+function ProtectedRoute({ children, adminOnly }) {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="loading-screen"><div className="loader" /></div>;
+  if (!user) return <Navigate to={adminOnly ? "/admin/login" : "/login"} replace />;
+  if (adminOnly && user.role !== 'admin') return <Navigate to="/dashboard" replace />;
+  return children;
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
+        <Route path="content" element={<ProtectedRoute><Content /></ProtectedRoute>} />
+        <Route path="content/:id" element={<ProtectedRoute><ContentPlayer /></ProtectedRoute>} />
+        <Route path="requests" element={<ProtectedRoute><MovieRequests /></ProtectedRoute>} />
+        <Route path="admin/subscriptions" element={<ProtectedRoute adminOnly><AdminSubscriptions /></ProtectedRoute>} />
+        <Route path="admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
+        <Route path="admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
+        <Route path="admin/content" element={<ProtectedRoute adminOnly><AdminContent /></ProtectedRoute>} />
+        <Route path="admin/requests" element={<ProtectedRoute adminOnly><AdminRequests /></ProtectedRoute>} />
+        <Route path="admin/settings" element={<ProtectedRoute adminOnly><AdminSettings /></ProtectedRoute>} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}

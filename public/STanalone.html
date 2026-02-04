@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Dashboard (Standalone)</title>
+    <style>
+      :root {
+        --bg: #0b0e14;
+        --card: rgba(255, 255, 255, 0.06);
+        --border: rgba(255, 255, 255, 0.12);
+        --text: #e8eef7;
+        --muted: #9aa6b2;
+        --accent: #14f1ff;
+        --accent-2: #ff4ad0;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", "DM Sans", system-ui, sans-serif;
+        background: radial-gradient(1200px 600px at 20% -10%, #132033 0%, #0b0e14 55%);
+        color: var(--text);
+        min-height: 100vh;
+      }
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 32px 20px 64px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      h1 {
+        font-size: 28px;
+        margin: 0;
+        letter-spacing: 0.5px;
+      }
+      .badge {
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(20, 241, 255, 0.12);
+        color: var(--accent);
+        border: 1px solid rgba(20, 241, 255, 0.4);
+        font-size: 12px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 16px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px;
+        backdrop-filter: blur(8px);
+      }
+      .card h2 {
+        font-size: 16px;
+        margin: 0 0 12px;
+        color: var(--accent);
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .row:last-child { border-bottom: none; }
+      .label { color: var(--muted); }
+      .value { font-weight: 600; }
+      .big {
+        font-size: 22px;
+        color: var(--accent-2);
+      }
+      .status {
+        margin-top: 12px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .error {
+        color: #ff6b6b;
+      }
+      .loader {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 3px solid rgba(255, 255, 255, 0.15);
+        border-top-color: var(--accent);
+        animation: spin 1s linear infinite;
+        margin: 20px auto 0;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @media (max-width: 640px) {
+        h1 { font-size: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>User Dashboard</h1>
+        <span class="badge">Live Data</span>
+      </header>
+
+      <div id="status" class="status">Loading…</div>
+      <div id="loader" class="loader" aria-label="Loading"></div>
+
+      <div id="grid" class="grid" style="display:none;">
+        <div class="card">
+          <h2>Profile</h2>
+          <div class="row">
+            <span class="label">Name</span>
+            <span id="fullName" class="value">-</span>
+          </div>
+          <div class="row">
+            <span class="label">Telegram</span>
+            <span id="telegram" class="value">-</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Subscription</h2>
+          <div class="row">
+            <span class="label">Plan</span>
+            <span id="plan" class="value">-</span>
+          </div>
+          <div class="row">
+            <span class="label">Start</span>
+            <span id="startDate" class="value">-</span>
+          </div>
+          <div class="row">
+            <span class="label">Expiry</span>
+            <span id="expiryDate" class="value">-</span>
+          </div>
+          <div class="row">
+            <span class="label">Remaining Days</span>
+            <span id="remainingDays" class="value big">0</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Requests</h2>
+          <div class="row">
+            <span class="label">Approved</span>
+            <span id="approved" class="value">0</span>
+          </div>
+          <div class="row">
+            <span class="label">Denied</span>
+            <span id="denied" class="value">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const statusEl = document.getElementById('status');
+      const loaderEl = document.getElementById('loader');
+      const gridEl = document.getElementById('grid');
+
+      function setText(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value ?? '-';
+      }
+
+      const API_BASE = 'http://localhost:3001/api';
+
+      async function loadDashboard() {
+        try {
+          const res = await fetch(`${API_BASE}/users/dashboard`, { credentials: 'include' });
+          if (!res.ok) throw new Error('Failed to load dashboard');
+          const data = await res.json();
+
+          setText('fullName', data.fullName || '-');
+          setText('telegram', data.telegramUsername || '-');
+          setText('plan', data.hasSubscription ? data.plan : 'No active subscription');
+          setText('startDate', data.startDate || '-');
+          setText('expiryDate', data.expiryDate || '-');
+          setText('remainingDays', data.remainingDays ?? 0);
+          setText('approved', data.approvedRequests ?? 0);
+          setText('denied', data.deniedRequests ?? 0);
+
+          statusEl.textContent = 'Loaded successfully.';
+          loaderEl.style.display = 'none';
+          gridEl.style.display = 'grid';
+        } catch (err) {
+          statusEl.textContent = 'Error: ' + err.message;
+          statusEl.classList.add('error');
+          loaderEl.style.display = 'none';
+        }
+      }
+
+      loadDashboard();
+    </script>
+  </body>
+  </html>

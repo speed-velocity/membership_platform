@@ -1,0 +1,53 @@
+.admin-login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(180deg, rgba(10, 10, 20, 0.98) 0%, rgba(20, 10, 30, 0.98) 100%);
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 2.5rem;
+  border: 1px solid rgba(255, 0, 170, 0.2);
+  box-shadow: 0 0 40px rgba(255, 0, 170, 0.1);
+}
+
+.admin-login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.admin-lock-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 0 10px rgba(255, 0, 170, 0.5));
+}
+
+.admin-login-header h1 {
+  font-size: 1.5rem;
+  color: var(--neon-magenta);
+  margin-bottom: 0.25rem;
+}
+
+.admin-login-header p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.admin-login-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.admin-login-footer a {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.admin-login-footer a:hover {
+  color: var(--neon-cyan);
+}

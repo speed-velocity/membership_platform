@@ -1,0 +1,185 @@
+.admin-page {
+  padding: 0;
+}
+
+.admin-subtitle {
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.admin-card {
+  display: block;
+  padding: 2rem;
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.admin-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 25px rgba(0, 245, 255, 0.2);
+}
+
+.admin-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--neon-cyan);
+}
+
+.admin-card p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.card-arrow {
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  color: var(--neon-cyan);
+  opacity: 0.6;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.admin-table th {
+  color: var(--neon-cyan);
+  font-weight: 600;
+}
+
+.admin-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.admin-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.admin-section {
+  margin-bottom: 2rem;
+}
+
+.admin-section h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: var(--neon-cyan);
+}
+
+.admin-header {
+  margin-bottom: 1.5rem;
+}
+
+.admin-message {
+  padding: 1rem;
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  color: #00ff88;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-row label {
+  min-width: 120px;
+}
+
+.admin-desc {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.saved-msg {
+  color: #00ff88;
+  margin-left: 1rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.status-pending {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.status-approved {
+  background: rgba(0, 255, 136, 0.2);
+  color: #00ff88;
+}
+
+.status-rejected {
+  background: rgba(255, 0, 100, 0.2);
+  color: #ff6b9d;
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.upload-form input[type="file"] {
+  font-size: 0.85rem;
+}
+
+.form-card {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+}
+
+.form-card input,
+.form-card textarea {
+  flex: 1;
+  min-width: 200px;
+}
+
+.plan-badge {
+  font-size: 0.85rem;
+  padding: 0.25rem 0.6rem;
+  background: rgba(0, 245, 255, 0.2);
+  border-radius: 6px;
+  color: var(--neon-cyan);
+}
+
+.days-ok {
+  color: #00ff88;
+}
+
+.days-warning {
+  color: #ffc107;
+  font-weight: 600;
+}

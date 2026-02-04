@@ -1,0 +1,94 @@
+.dashboard {
+  padding: 0;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.dashboard-card {
+  padding: 2rem;
+}
+
+.dashboard-card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  color: var(--neon-cyan);
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.stat-row:last-of-type {
+  border-bottom: none;
+}
+
+.stat-label {
+  color: var(--text-muted);
+}
+
+.stat-value {
+  font-weight: 600;
+}
+
+.neon-text {
+  color: var(--neon-cyan);
+}
+
+.remaining-days {
+  font-size: 1.5rem;
+  color: var(--neon-magenta);
+  text-shadow: 0 0 15px rgba(255, 0, 170, 0.5);
+}
+
+.mt {
+  margin-top: 1.5rem;
+  display: inline-block;
+  text-align: center;
+}
+
+.no-sub {
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.no-sub-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+.quick-actions .action-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+
+.quick-actions .action-link:hover {
+  background: rgba(0, 245, 255, 0.1);
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+}
+
+.action-icon {
+  font-size: 1.25rem;
+  color: var(--neon-cyan);
+}
