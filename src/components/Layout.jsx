@@ -17,7 +17,7 @@ export default function Layout() {
       <nav className="navbar">
         <NavLink to="/dashboard" className="logo">
           <span className="logo-icon">◆</span>
-          <span>CINEMATIC</span>
+          <span>Movie Mayhem</span>
         </NavLink>
         <div className="nav-links">
           {user?.role === 'user' && <NavLink to="/dashboard">Dashboard</NavLink>}

@@ -70,6 +70,13 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
+.truncate {
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .admin-actions {
   display: flex;
   gap: 0.5rem;

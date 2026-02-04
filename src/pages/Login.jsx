@@ -39,7 +39,7 @@ export default function Login() {
     <div className="auth-page">
       <div className="auth-card glass-card animate-fade-in">
         <h1 className="auth-title">Welcome Back</h1>
-        <p className="auth-subtitle">Sign in to your cinematic experience</p>
+        <p className="auth-subtitle">Sign in to your Movie Mayhem experience</p>
         <form onSubmit={handleSubmit} className="auth-form">
           {error && <div className="auth-error">{error}</div>}
           <input

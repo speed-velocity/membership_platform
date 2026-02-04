@@ -7,6 +7,7 @@ export default function AdminDashboard() {
     { to: '/admin/subscriptions', label: 'Active Subscriptions', desc: 'View all active members' },
     { to: '/admin/users', label: 'Manage Users', desc: 'View users and manage subscriptions' },
     { to: '/admin/requests', label: 'Movie Requests', desc: 'Monitor and manage requests' },
+    { to: '/admin/logins', label: 'Login History', desc: 'See recent sign-ins' },
     { to: '/admin/settings', label: 'Settings', desc: 'Request limits and config' },
   ];
 
