@@ -29,6 +29,43 @@ export default function Signup() {
 
   return (
     <div className="auth-page">
+      <div className="poster-wall" aria-hidden="true">
+        <div className="poster-col">
+          <div className="poster-card tall" />
+          <div className="poster-card" />
+          <div className="poster-card short" />
+          <div className="poster-card" />
+          <div className="poster-card tall" />
+        </div>
+        <div className="poster-col">
+          <div className="poster-card" />
+          <div className="poster-card short" />
+          <div className="poster-card tall" />
+          <div className="poster-card" />
+          <div className="poster-card" />
+        </div>
+        <div className="poster-col">
+          <div className="poster-card short" />
+          <div className="poster-card tall" />
+          <div className="poster-card" />
+          <div className="poster-card" />
+          <div className="poster-card tall" />
+        </div>
+        <div className="poster-col">
+          <div className="poster-card" />
+          <div className="poster-card tall" />
+          <div className="poster-card short" />
+          <div className="poster-card" />
+          <div className="poster-card" />
+        </div>
+        <div className="poster-col">
+          <div className="poster-card tall" />
+          <div className="poster-card" />
+          <div className="poster-card short" />
+          <div className="poster-card" />
+          <div className="poster-card tall" />
+        </div>
+      </div>
       <div className="auth-card glass-card animate-fade-in">
         <div className="brand-mark">Movie Mayhem</div>
         <h1 className="auth-title">Join the Experience</h1>

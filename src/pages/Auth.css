@@ -6,6 +6,7 @@
   padding: 2rem;
   position: relative;
   perspective: 900px;
+  overflow: hidden;
 }
 
 .auth-card {
@@ -14,6 +15,8 @@
   padding: 2.5rem;
   transform-style: preserve-3d;
   animation: auth-float 7s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
 }
 
 .auth-page::before {
@@ -43,6 +46,52 @@
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
   animation: frame-tilt 8s ease-in-out infinite;
   pointer-events: none;
+}
+
+.poster-wall {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(140px, 1fr));
+  gap: 18px;
+  padding: 6vh 8vw;
+  opacity: 0.55;
+  z-index: 1;
+  pointer-events: none;
+  mask-image: linear-gradient(90deg, transparent 0%, black 15%, black 85%, transparent 100%);
+}
+
+.poster-col {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: poster-scroll 18s linear infinite;
+}
+
+.poster-col:nth-child(2) { animation-duration: 22s; animation-direction: reverse; }
+.poster-col:nth-child(3) { animation-duration: 20s; }
+.poster-col:nth-child(4) { animation-duration: 24s; animation-direction: reverse; }
+.poster-col:nth-child(5) { animation-duration: 19s; }
+
+.poster-card {
+  height: 180px;
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    radial-gradient(120px 80px at 20% 20%, rgba(127, 43, 255, 0.35), transparent 60%),
+    radial-gradient(140px 90px at 80% 80%, rgba(98, 86, 210, 0.25), transparent 60%),
+    #15151a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  transform: translateZ(0);
+}
+
+.poster-card.tall { height: 240px; }
+.poster-card.short { height: 140px; }
+
+@keyframes poster-scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-35%); }
 }
 
 .brand-mark {
