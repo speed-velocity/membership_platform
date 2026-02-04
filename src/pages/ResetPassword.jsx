@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import PasswordInput from '../components/PasswordInput';
+import PosterWall from '../components/PosterWall';
 import './Auth.css';
 
 const API = '/api';
@@ -38,43 +39,7 @@ export default function ResetPassword() {
 
   return (
     <div className="auth-page">
-      <div className="poster-wall" aria-hidden="true">
-        <div className="poster-col">
-          <div className="poster-card tall" />
-          <div className="poster-card" />
-          <div className="poster-card short" />
-          <div className="poster-card" />
-          <div className="poster-card tall" />
-        </div>
-        <div className="poster-col">
-          <div className="poster-card" />
-          <div className="poster-card short" />
-          <div className="poster-card tall" />
-          <div className="poster-card" />
-          <div className="poster-card" />
-        </div>
-        <div className="poster-col">
-          <div className="poster-card short" />
-          <div className="poster-card tall" />
-          <div className="poster-card" />
-          <div className="poster-card" />
-          <div className="poster-card tall" />
-        </div>
-        <div className="poster-col">
-          <div className="poster-card" />
-          <div className="poster-card tall" />
-          <div className="poster-card short" />
-          <div className="poster-card" />
-          <div className="poster-card" />
-        </div>
-        <div className="poster-col">
-          <div className="poster-card tall" />
-          <div className="poster-card" />
-          <div className="poster-card short" />
-          <div className="poster-card" />
-          <div className="poster-card tall" />
-        </div>
-      </div>
+      <PosterWall />
       <div className="auth-card glass-card animate-fade-in">
         <div className="brand-mark">Movie Mayhem</div>
         <h1 className="auth-title">Set New Password</h1>

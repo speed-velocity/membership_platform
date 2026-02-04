@@ -84,10 +84,19 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
   transform: translateZ(0);
+  overflow: hidden;
 }
 
 .poster-card.tall { height: 240px; }
 .poster-card.short { height: 140px; }
+
+.poster-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.05) contrast(1.05);
+}
 
 @keyframes poster-scroll {
   0% { transform: translateY(0); }
