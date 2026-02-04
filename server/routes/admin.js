@@ -167,6 +167,16 @@ router.get('/requests', (req, res) => {
   res.json({ requests: rows });
 });
 
+router.get('/logins', (req, res) => {
+  const rows = db.prepare(`
+    SELECT lh.id, lh.user_id, lh.email, lh.full_name, lh.role, lh.ip, lh.user_agent, lh.created_at
+    FROM login_history lh
+    ORDER BY lh.created_at DESC
+    LIMIT 200
+  `).all();
+  res.json({ logins: rows });
+});
+
 router.put('/requests/:id', (req, res) => {
   const { status } = req.body;
   if (!status) return res.status(400).json({ error: 'status required' });

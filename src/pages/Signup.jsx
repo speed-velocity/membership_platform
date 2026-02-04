@@ -5,6 +5,7 @@ import PasswordInput from '../components/PasswordInput';
 import './Auth.css';
 
 export default function Signup() {
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -17,7 +18,7 @@ export default function Signup() {
     setError('');
     setLoading(true);
     try {
-      await register(email, password);
+      await register(email, password, fullName);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);
@@ -33,6 +34,13 @@ export default function Signup() {
         <p className="auth-subtitle">Create your membership account</p>
         <form onSubmit={handleSubmit} className="auth-form">
           {error && <div className="auth-error">{error}</div>}
+          <input
+            type="text"
+            placeholder="Full name"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            required
+          />
           <input
             type="email"
             placeholder="Email"

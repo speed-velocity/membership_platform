@@ -100,6 +100,18 @@ mod.initDb = async function () {
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
 
+    CREATE TABLE IF NOT EXISTS login_history (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      email TEXT NOT NULL,
+      full_name TEXT,
+      role TEXT NOT NULL,
+      ip TEXT,
+      user_agent TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+
     CREATE TABLE IF NOT EXISTS settings (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
@@ -108,6 +120,8 @@ mod.initDb = async function () {
     CREATE INDEX IF NOT EXISTS idx_subscriptions_user ON subscriptions(user_id);
     CREATE INDEX IF NOT EXISTS idx_movie_requests_user ON movie_requests(user_id);
     CREATE INDEX IF NOT EXISTS idx_movie_requests_created ON movie_requests(created_at);
+    CREATE INDEX IF NOT EXISTS idx_login_history_user ON login_history(user_id);
+    CREATE INDEX IF NOT EXISTS idx_login_history_created ON login_history(created_at);
   `);
 
   // Ensure users.last_login/full_name/telegram_username exist
@@ -127,6 +141,17 @@ mod.initDb = async function () {
     console.error('DB migration error:', e.message);
   }
 
+  // Ensure login_history.full_name exists
+  try {
+    const info = db.exec("PRAGMA table_info(login_history)");
+    const columns = info?.[0]?.values?.map((row) => row[1]) || [];
+    if (columns.includes('id') && !columns.includes('full_name')) {
+      db.run('ALTER TABLE login_history ADD COLUMN full_name TEXT');
+    }
+  } catch (e) {
+    console.error('DB migration error:', e.message);
+  }
+
   const requestLimit = db.exec("SELECT * FROM settings WHERE key = 'request_limit_per_12h'");
   if (!requestLimit?.length || !requestLimit[0]?.values?.length) {
     db.run("INSERT INTO settings (key, value) VALUES ('request_limit_per_12h', '2')");
@@ -139,8 +164,8 @@ mod.initDb = async function () {
   adminStmt.free();
   if (!hasAdmin) {
     const hashedPassword = bcrypt.hashSync(config.adminPassword, 10);
-    const stmt = db.prepare('INSERT INTO users (email, password, role) VALUES (?, ?, ?)');
-    stmt.run([adminEmail, hashedPassword, 'admin']);
+    const stmt = db.prepare('INSERT INTO users (email, password, role, full_name) VALUES (?, ?, ?, ?)');
+    stmt.run([adminEmail, hashedPassword, 'admin', 'Admin']);
     stmt.free();
     console.log(`Admin created: ${adminEmail}`);
   }
