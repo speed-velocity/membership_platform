@@ -1,17 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap');
+
 :root {
-  --bg-dark: #0a0a0f;
-  --bg-card: rgba(15, 15, 25, 0.7);
-  --bg-glass: rgba(20, 20, 35, 0.5);
-  --neon-cyan: #00f5ff;
-  --neon-magenta: #ff00aa;
-  --neon-purple: #a855f7;
-  --neon-blue: #3b82f6;
-  --text-primary: #f0f0f5;
-  --text-muted: #8888aa;
-  --border-glow: rgba(0, 245, 255, 0.3);
-  --shadow-glow: 0 0 20px rgba(0, 245, 255, 0.2);
-  --font-display: 'Orbitron', sans-serif;
-  --font-body: 'Rajdhani', sans-serif;
+  --bg-dark: #0d1016;
+  --bg-card: rgba(22, 26, 34, 0.8);
+  --bg-glass: rgba(18, 22, 30, 0.65);
+  --neon-cyan: #c8b28a;
+  --neon-magenta: #9ab1c1;
+  --neon-purple: #8f96a6;
+  --neon-blue: #7e97a8;
+  --text-primary: #e7ebf2;
+  --text-muted: #9aa3b2;
+  --border-glow: rgba(200, 178, 138, 0.25);
+  --shadow-glow: 0 6px 24px rgba(12, 15, 22, 0.55);
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'DM Sans', sans-serif;
 }
 
 * {
@@ -26,19 +28,17 @@ body {
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
+  letter-spacing: 0.01em;
 }
 
 body::before {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(0, 245, 255, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(255, 0, 170, 0.03) 0%, transparent 70%);
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(200, 178, 138, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 85%, rgba(100, 125, 150, 0.08) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 35%);
   pointer-events: none;
   z-index: 0;
 }
@@ -57,63 +57,62 @@ h1, h2, h3, h4 {
 a {
   color: var(--neon-cyan);
   text-decoration: none;
-  transition: color 0.2s, text-shadow 0.2s;
+  transition: color 0.2s;
 }
 
 a:hover {
   color: var(--neon-magenta);
-  text-shadow: 0 0 10px rgba(255, 0, 170, 0.5);
 }
 
 /* Glassmorphism cards */
 .glass-card {
   background: var(--bg-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
   padding: 1.5rem;
-  transition: all 0.3s ease;
+  box-shadow: var(--shadow-glow);
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
 .glass-card:hover {
-  border-color: var(--border-glow);
-  box-shadow: var(--shadow-glow);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
 }
 
 /* Glowing buttons */
 .btn-glow {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  transition: all 0.2s ease;
+  letter-spacing: 0.02em;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
-  color: var(--bg-dark);
-  box-shadow: 0 0 20px rgba(0, 245, 255, 0.4);
+  background: linear-gradient(135deg, #c8b28a, #9d865f);
+  color: #12151c;
+  box-shadow: 0 6px 18px rgba(19, 22, 30, 0.6);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 0 30px rgba(0, 245, 255, 0.6);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
+  filter: brightness(1.02);
 }
 
 .btn-secondary {
   background: transparent;
-  color: var(--neon-cyan);
-  border: 2px solid var(--neon-cyan);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .btn-secondary:hover {
-  background: rgba(0, 245, 255, 0.1);
-  box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 /* Animations */
@@ -134,9 +133,9 @@ a:hover {
 /* Input styles */
 input, textarea, select {
   font-family: var(--font-body);
-  background: rgba(10, 10, 20, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  background: rgba(12, 15, 22, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
   padding: 0.75rem 1rem;
   color: var(--text-primary);
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -144,8 +143,8 @@ input, textarea, select {
 
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 15px rgba(0, 245, 255, 0.2);
+  border-color: rgba(200, 178, 138, 0.6);
+  box-shadow: 0 0 0 3px rgba(200, 178, 138, 0.15);
 }
 
 input::placeholder, textarea::placeholder {
