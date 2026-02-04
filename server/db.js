@@ -54,22 +54,6 @@ mod.initDb = async function () {
   } else {
     db = new SQL.Database();
   }
-  // Ensure users.last_login/full_name/telegram_username exist
-  try {
-    const info = db.exec("PRAGMA table_info(users)");
-    const columns = info?.[0]?.values?.map((row) => row[1]) || [];
-    if (!columns.includes('last_login')) {
-      db.run('ALTER TABLE users ADD COLUMN last_login DATETIME');
-    }
-    if (!columns.includes('full_name')) {
-      db.run('ALTER TABLE users ADD COLUMN full_name TEXT');
-    }
-    if (!columns.includes('telegram_username')) {
-      db.run('ALTER TABLE users ADD COLUMN telegram_username TEXT');
-    }
-  } catch (e) {
-    console.error('DB migration error:', e.message);
-  }
   // Ensure base schema exists
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
@@ -125,6 +109,23 @@ mod.initDb = async function () {
     CREATE INDEX IF NOT EXISTS idx_movie_requests_user ON movie_requests(user_id);
     CREATE INDEX IF NOT EXISTS idx_movie_requests_created ON movie_requests(created_at);
   `);
+
+  // Ensure users.last_login/full_name/telegram_username exist
+  try {
+    const info = db.exec("PRAGMA table_info(users)");
+    const columns = info?.[0]?.values?.map((row) => row[1]) || [];
+    if (!columns.includes('last_login')) {
+      db.run('ALTER TABLE users ADD COLUMN last_login DATETIME');
+    }
+    if (!columns.includes('full_name')) {
+      db.run('ALTER TABLE users ADD COLUMN full_name TEXT');
+    }
+    if (!columns.includes('telegram_username')) {
+      db.run('ALTER TABLE users ADD COLUMN telegram_username TEXT');
+    }
+  } catch (e) {
+    console.error('DB migration error:', e.message);
+  }
 
   const requestLimit = db.exec("SELECT * FROM settings WHERE key = 'request_limit_per_12h'");
   if (!requestLimit?.length || !requestLimit[0]?.values?.length) {
