@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
@@ -32,6 +32,25 @@ function ProtectedRoute({ children, adminOnly }) {
 }
 
 export default function App() {
+  useEffect(() => {
+    const root = document.documentElement;
+    let raf = null;
+    const handleMove = (event) => {
+      const x = (event.clientX / window.innerWidth) * 2 - 1;
+      const y = (event.clientY / window.innerHeight) * 2 - 1;
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        root.style.setProperty('--parallax-x', x.toFixed(3));
+        root.style.setProperty('--parallax-y', y.toFixed(3));
+      });
+    };
+    window.addEventListener('mousemove', handleMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', handleMove);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
     <Routes>
       <Route path="/login" element={<Login />} />

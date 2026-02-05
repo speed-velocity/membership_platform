@@ -14,6 +14,8 @@
   --shadow-glow: 0 16px 48px rgba(0, 0, 0, 0.6);
   --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'Sora', sans-serif;
+  --parallax-x: 0;
+  --parallax-y: 0;
 }
 
 * {
@@ -118,8 +120,12 @@ a:hover {
 
 .glass-card:hover {
   border-color: rgba(65, 209, 255, 0.35);
-  transform: translateY(-6px) rotateX(2deg) rotateY(-2deg);
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.65);
+  transform: translateY(-6px)
+    rotateX(calc(var(--parallax-y) * 3deg))
+    rotateY(calc(var(--parallax-x) * -3deg));
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.65),
+    0 0 30px rgba(65, 209, 255, 0.18);
 }
 
 .glass-card:hover::after {
@@ -178,6 +184,11 @@ a:hover {
   background: rgba(255, 255, 255, 0.04);
 }
 
+.btn-glow:focus-visible {
+  outline: none;
+  animation: btn-pulse 1.6s ease infinite;
+}
+
 /* Animations */
 @keyframes pulse-glow {
   0%, 100% { opacity: 1; }
@@ -212,6 +223,15 @@ a:hover {
   0% { transform: translateX(-120%); }
   60% { transform: translateX(120%); }
   100% { transform: translateX(120%); }
+}
+
+@keyframes btn-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(65, 209, 255, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(65, 209, 255, 0.08);
+  }
 }
 
 /* Input styles */
