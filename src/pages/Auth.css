@@ -156,6 +156,11 @@
   color: var(--text-muted);
 }
 
+.auth-switch {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: center;
+}
 @keyframes auth-float {
   0%, 100% { transform: translateY(0) rotateX(0deg); }
   50% { transform: translateY(-6px) rotateX(1deg); }

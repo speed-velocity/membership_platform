@@ -44,6 +44,31 @@ export function AuthProvider({ children }) {
     return data;
   };
 
+  const requestOtp = async (email) => {
+    const res = await fetch(`${API}/auth/request-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to send code');
+    return data;
+  };
+
+  const verifyOtp = async (email, otp) => {
+    const res = await fetch(`${API}/auth/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, otp }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Invalid code');
+    setUser(data.user);
+    return data;
+  };
+
   const adminLogin = async (email, password) => {
     const res = await fetch(`${API}/auth/admin-login`, {
       method: 'POST',
@@ -63,7 +88,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, adminLogin, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, adminLogin, logout, requestOtp, verifyOtp }}>
       {children}
     </AuthContext.Provider>
   );

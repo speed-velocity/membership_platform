@@ -13,4 +13,5 @@ module.exports = {
   notificationEmail: process.env.NOTIFICATION_EMAIL || process.env.ADMIN_EMAIL || 'admin@platform.com',
   appUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
   showResetLink: process.env.SHOW_RESET_LINK === 'true',
+  showOtp: process.env.SHOW_OTP === 'true',
 };
