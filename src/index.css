@@ -75,8 +75,8 @@ body .cinema-background::before {
     radial-gradient(220px 220px at 70% 30%, rgba(255, 210, 120, 0.18), transparent 70%),
     radial-gradient(320px 320px at 75% 32%, rgba(255, 210, 120, 0.12), transparent 72%),
     radial-gradient(420px 420px at 80% 36%, rgba(255, 210, 120, 0.08), transparent 75%);
-  filter: blur(4px);
-  animation: projector-sweep 12s ease-in-out infinite;
+  filter: blur(6px);
+  animation: projector-sweep 18s ease-in-out infinite;
 }
 
 body .cinema-background::after {
@@ -94,10 +94,43 @@ body .cinema-background::after {
       rgba(0, 0, 0, 0.55) 0 10px,
       transparent 10px 58px
     );
-  opacity: 0.22;
+  opacity: 0.14;
   mix-blend-mode: screen;
   transform: translateX(-10%);
-  animation: film-strip 18s linear infinite;
+  animation: film-strip 28s linear infinite;
+}
+
+body .cinema-cameras {
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+body .cinema-cameras::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(220px 160px at 12% 18%, rgba(255, 255, 255, 0.06), transparent 70%),
+    radial-gradient(180px 140px at 88% 30%, rgba(255, 255, 255, 0.05), transparent 72%),
+    radial-gradient(240px 170px at 20% 78%, rgba(255, 255, 255, 0.05), transparent 72%);
+}
+
+body .cinema-cameras::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(22px 22px at 15% 20%, rgba(255, 255, 255, 0.14), transparent 70%),
+    radial-gradient(28px 24px at 19% 22%, rgba(255, 255, 255, 0.12), transparent 70%),
+    radial-gradient(20px 20px at 85% 32%, rgba(255, 255, 255, 0.12), transparent 70%),
+    radial-gradient(26px 20px at 88% 35%, rgba(255, 255, 255, 0.1), transparent 70%),
+    radial-gradient(22px 22px at 23% 80%, rgba(255, 255, 255, 0.12), transparent 70%),
+    linear-gradient(120deg, transparent 45%, rgba(255, 255, 255, 0.08) 46%, rgba(255, 255, 255, 0.08) 54%, transparent 55%),
+    linear-gradient(300deg, transparent 52%, rgba(255, 255, 255, 0.06) 53%, rgba(255, 255, 255, 0.06) 58%, transparent 59%);
+  animation: camera-drift 26s ease-in-out infinite;
 }
 
 #root {
@@ -261,14 +294,19 @@ a:hover {
 
 @keyframes projector-sweep {
   0% { transform: translateX(8%) translateY(-2%); opacity: 0.2; }
-  40% { transform: translateX(-6%) translateY(2%); opacity: 0.45; }
-  70% { transform: translateX(4%) translateY(-1%); opacity: 0.3; }
+  40% { transform: translateX(-6%) translateY(2%); opacity: 0.3; }
+  70% { transform: translateX(4%) translateY(-1%); opacity: 0.25; }
   100% { transform: translateX(10%) translateY(-2%); opacity: 0.2; }
 }
 
 @keyframes film-strip {
   0% { transform: translateX(-12%); }
   100% { transform: translateX(12%); }
+}
+
+@keyframes camera-drift {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.16; }
+  50% { transform: translateY(-6px) translateX(8px); opacity: 0.22; }
 }
 
 @keyframes btn-shine {
