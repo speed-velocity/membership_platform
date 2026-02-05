@@ -104,10 +104,27 @@ a:hover {
   pointer-events: none;
 }
 
+.glass-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: radial-gradient(600px 200px at 20% 0%, rgba(65, 209, 255, 0.18), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.35s ease;
+  transform: translateY(6px);
+  pointer-events: none;
+}
+
 .glass-card:hover {
   border-color: rgba(65, 209, 255, 0.35);
-  transform: translateY(-6px) rotateX(0.6deg) rotateY(-0.6deg);
+  transform: translateY(-6px) rotateX(2deg) rotateY(-2deg);
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.65);
+}
+
+.glass-card:hover::after {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Glowing buttons */
@@ -120,12 +137,29 @@ a:hover {
   cursor: pointer;
   transition: all 0.2s ease;
   letter-spacing: 0.02em;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn-primary {
   background: linear-gradient(135deg, #ffffff, #e9edf3);
   color: #0a0a0b;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+}
+
+.btn-primary::after,
+.btn-secondary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  transform: translateX(-120%);
+  opacity: 0;
+}
+
+.btn-glow:hover::after {
+  animation: btn-shine 1.2s ease;
+  opacity: 1;
 }
 
 .btn-primary:hover {
@@ -172,6 +206,12 @@ a:hover {
 @keyframes card-float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
+}
+
+@keyframes btn-shine {
+  0% { transform: translateX(-120%); }
+  60% { transform: translateX(120%); }
+  100% { transform: translateX(120%); }
 }
 
 /* Input styles */
