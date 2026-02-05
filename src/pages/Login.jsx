@@ -8,12 +8,9 @@ import './Auth.css';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [otp, setOtp] = useState('');
-  const [otpStage, setOtpStage] = useState('request');
-  const [mode, setMode] = useState('password');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, requestOtp, verifyOtp, user } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -25,24 +22,13 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      if (mode === 'password') {
-        const data = await login(email, password);
-        if (data?.user?.role === 'admin') {
-          setError('Use the admin login at /admin/login');
-          setLoading(false);
-          return;
-        }
-        navigate('/dashboard');
-      } else if (otpStage === 'request') {
-        const timeout = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('OTP request timed out. Try again.')), 10000)
-        );
-        await Promise.race([requestOtp(email), timeout]);
-        setOtpStage('verify');
-      } else {
-        await verifyOtp(email, otp);
-        navigate('/dashboard');
+      const data = await login(email, password);
+      if (data?.user?.role === 'admin') {
+        setError('Use the admin login at /admin/login');
+        setLoading(false);
+        return;
       }
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -66,66 +52,16 @@ export default function Login() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          {mode === 'password' ? (
-            <PasswordInput
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          ) : (
-            <>
-              <input
-                type="text"
-                placeholder="6-digit code"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                required={otpStage === 'verify'}
-              />
-            </>
-          )}
+          <PasswordInput
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
           <button type="submit" className="btn-glow btn-primary" disabled={loading}>
-            {loading
-              ? mode === 'password'
-                ? 'Signing in...'
-                : otpStage === 'request'
-                  ? 'Sending code...'
-                  : 'Verifying...'
-              : mode === 'password'
-                ? 'Sign In'
-                : otpStage === 'request'
-                  ? 'Send Code'
-                  : 'Verify Code'}
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-        <div className="auth-switch">
-          <button
-            type="button"
-            className="btn-glow btn-secondary"
-            onClick={() => {
-              setMode((m) => (m === 'password' ? 'otp' : 'password'));
-              setOtpStage('request');
-              setOtp('');
-              setError('');
-            }}
-          >
-            {mode === 'password' ? 'Use Email OTP' : 'Use Password'}
-          </button>
-        </div>
-        {mode === 'otp' && otpStage === 'request' && (
-          <div className="auth-switch">
-            <button
-              type="button"
-              className="btn-glow btn-secondary"
-              onClick={() => {
-                setOtpStage('verify');
-                setError('');
-              }}
-            >
-              I already have a code
-            </button>
-          </div>
-        )}
         <p className="auth-footer">
           Don't have an account? <Link to="/signup">Sign up</Link>
           {' · '}

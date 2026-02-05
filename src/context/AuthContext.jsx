@@ -56,27 +56,6 @@ export function AuthProvider({ children }) {
     return data;
   };
 
-  const requestOtp = async (email) => {
-    const data = await fetchJson(`${API}/auth/request-otp`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email }),
-    });
-    return data;
-  };
-
-  const verifyOtp = async (email, otp) => {
-    const data = await fetchJson(`${API}/auth/verify-otp`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email, otp }),
-    });
-    setUser(data.user);
-    return data;
-  };
-
   const adminLogin = async (email, password) => {
     const data = await fetchJson(`${API}/auth/admin-login`, {
       method: 'POST',
@@ -94,7 +73,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, adminLogin, logout, requestOtp, verifyOtp }}>
+    <AuthContext.Provider value={{ user, loading, login, register, adminLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );
