@@ -22,6 +22,7 @@ export default function Layout() {
         <div className="nav-links">
           {user?.role === 'user' && <NavLink to="/dashboard">Dashboard</NavLink>}
           {user?.role === 'user' && <NavLink to="/payment">Subscribe</NavLink>}
+          {user?.role === 'user' && <NavLink to="/watchlist">Watchlist</NavLink>}
           {user?.role === 'user' && <NavLink to="/requests">Requests</NavLink>}
           {user?.role === 'admin' && (
             <NavLink to="/admin">Admin</NavLink>

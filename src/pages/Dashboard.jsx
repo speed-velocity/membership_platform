@@ -77,6 +77,14 @@ export default function Dashboard() {
 
         <div className="glass-card dashboard-card quick-actions">
           <h2>Quick Actions</h2>
+          <Link to="/content" className="action-link">
+            <span className="action-icon">â–¶</span>
+            <span>Browse Content</span>
+          </Link>
+          <Link to="/watchlist" className="action-link">
+            <span className="action-icon">â˜…</span>
+            <span>Your Watchlist</span>
+          </Link>
           <Link to="/requests" className="action-link">
             <span className="action-icon">âœ‰</span>
             <span>Movie Requests</span>

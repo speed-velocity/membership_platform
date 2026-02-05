@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import Content from './pages/Content';
 import ContentPlayer from './pages/ContentPlayer';
 import MovieRequests from './pages/MovieRequests';
+import Watchlist from './pages/Watchlist';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminSubscriptions from './pages/admin/AdminSubscriptions';
@@ -19,6 +20,8 @@ import AdminContent from './pages/admin/AdminContent';
 import AdminRequests from './pages/admin/AdminRequests';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminLogins from './pages/admin/AdminLogins';
+import AdminAnalytics from './pages/admin/AdminAnalytics';
+import AdminActivity from './pages/admin/AdminActivity';
 
 function ProtectedRoute({ children, adminOnly }) {
   const { user, loading } = useAuth();
@@ -42,6 +45,7 @@ export default function App() {
         <Route path="payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
         <Route path="content" element={<ProtectedRoute><Content /></ProtectedRoute>} />
         <Route path="content/:id" element={<ProtectedRoute><ContentPlayer /></ProtectedRoute>} />
+        <Route path="watchlist" element={<ProtectedRoute><Watchlist /></ProtectedRoute>} />
         <Route path="requests" element={<ProtectedRoute><MovieRequests /></ProtectedRoute>} />
         <Route path="admin/subscriptions" element={<ProtectedRoute adminOnly><AdminSubscriptions /></ProtectedRoute>} />
         <Route path="admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
@@ -49,6 +53,8 @@ export default function App() {
         <Route path="admin/content" element={<ProtectedRoute adminOnly><AdminContent /></ProtectedRoute>} />
         <Route path="admin/requests" element={<ProtectedRoute adminOnly><AdminRequests /></ProtectedRoute>} />
         <Route path="admin/logins" element={<ProtectedRoute adminOnly><AdminLogins /></ProtectedRoute>} />
+        <Route path="admin/analytics" element={<ProtectedRoute adminOnly><AdminAnalytics /></ProtectedRoute>} />
+        <Route path="admin/activity" element={<ProtectedRoute adminOnly><AdminActivity /></ProtectedRoute>} />
         <Route path="admin/settings" element={<ProtectedRoute adminOnly><AdminSettings /></ProtectedRoute>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

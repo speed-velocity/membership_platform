@@ -4,6 +4,8 @@ import './Admin.css';
 
 export default function AdminDashboard() {
   const links = [
+    { to: '/admin/analytics', label: 'Analytics', desc: 'Key platform metrics' },
+    { to: '/admin/activity', label: 'User Activity', desc: 'Logins and request events' },
     { to: '/admin/subscriptions', label: 'Active Subscriptions', desc: 'View all active members' },
     { to: '/admin/users', label: 'Manage Users', desc: 'View users and manage subscriptions' },
     { to: '/admin/requests', label: 'Movie Requests', desc: 'Monitor and manage requests' },
