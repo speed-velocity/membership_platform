@@ -177,6 +177,45 @@ router.get('/logins', (req, res) => {
   res.json({ logins: rows });
 });
 
+router.get('/analytics', (req, res) => {
+  const totalUsers = db.prepare("SELECT COUNT(*) as count FROM users WHERE role = 'user'").get().count;
+  const activeSubs = db.prepare(
+    "SELECT COUNT(*) as count FROM subscriptions WHERE is_active = 1 AND expiry_date >= date('now')"
+  ).get().count;
+  const totalRequests = db.prepare('SELECT COUNT(*) as count FROM movie_requests').get().count;
+  const pendingRequests = db.prepare("SELECT COUNT(*) as count FROM movie_requests WHERE status = 'pending'").get().count;
+  const approvedRequests = db.prepare("SELECT COUNT(*) as count FROM movie_requests WHERE status = 'approved'").get().count;
+  const deniedRequests = db.prepare("SELECT COUNT(*) as count FROM movie_requests WHERE status = 'denied'").get().count;
+  const logins7d = db.prepare(
+    "SELECT COUNT(*) as count FROM login_history WHERE created_at >= datetime('now', '-7 day')"
+  ).get().count;
+  res.json({
+    totalUsers,
+    activeSubs,
+    totalRequests,
+    pendingRequests,
+    approvedRequests,
+    deniedRequests,
+    logins7d,
+  });
+});
+
+router.get('/activity', (req, res) => {
+  const rows = db.prepare(`
+    SELECT 'login' as type, lh.email as email, lh.created_at as created_at,
+           lh.ip as meta, lh.user_agent as detail
+    FROM login_history lh
+    UNION ALL
+    SELECT 'request' as type, u.email as email, mr.created_at as created_at,
+           mr.status as meta, mr.title as detail
+    FROM movie_requests mr
+    JOIN users u ON u.id = mr.user_id
+    ORDER BY created_at DESC
+    LIMIT 200
+  `).all();
+  res.json({ activity: rows });
+});
+
 router.put('/requests/:id', (req, res) => {
   const { status } = req.body;
   if (!status) return res.status(400).json({ error: 'status required' });

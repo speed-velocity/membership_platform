@@ -137,6 +137,16 @@ mod.initDb = async function () {
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
 
+    CREATE TABLE IF NOT EXISTS watchlist (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      content_id INTEGER NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, content_id),
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (content_id) REFERENCES content(id)
+    );
+
     CREATE INDEX IF NOT EXISTS idx_subscriptions_user ON subscriptions(user_id);
     CREATE INDEX IF NOT EXISTS idx_movie_requests_user ON movie_requests(user_id);
     CREATE INDEX IF NOT EXISTS idx_movie_requests_created ON movie_requests(created_at);
@@ -146,6 +156,8 @@ mod.initDb = async function () {
     CREATE INDEX IF NOT EXISTS idx_password_resets_token ON password_resets(token_hash);
     CREATE INDEX IF NOT EXISTS idx_email_otps_user ON email_otps(user_id);
     CREATE INDEX IF NOT EXISTS idx_email_otps_hash ON email_otps(otp_hash);
+    CREATE INDEX IF NOT EXISTS idx_watchlist_user ON watchlist(user_id);
+    CREATE INDEX IF NOT EXISTS idx_watchlist_content ON watchlist(content_id);
   `);
 
   // Ensure users.last_login/full_name/telegram_username exist

@@ -24,13 +24,18 @@ function getActiveSubscription(userId) {
 router.get('/', authMiddleware, (req, res) => {
   const hasSub = getActiveSubscription(req.user.id);
   const category = req.query.category;
-  let sql = 'SELECT * FROM content WHERE 1=1';
-  const params = [];
+  let sql = `
+    SELECT c.*, w.id as watch_id
+    FROM content c
+    LEFT JOIN watchlist w ON w.content_id = c.id AND w.user_id = ?
+    WHERE 1=1
+  `;
+  const params = [req.user.id];
   if (category) {
-    sql += ' AND category = ?';
+    sql += ' AND c.category = ?';
     params.push(category);
   }
-  sql += ' ORDER BY created_at DESC';
+  sql += ' ORDER BY c.created_at DESC';
   const items = db.prepare(sql).all(...params);
   const withAccess = items.map((item) => ({
     id: item.id,
@@ -40,6 +45,7 @@ router.get('/', authMiddleware, (req, res) => {
     thumbnail_path: item.thumbnail_path,
     created_at: item.created_at,
     canAccess: !!hasSub,
+    isFavorite: !!item.watch_id,
     video_1080_path: hasSub ? item.video_1080_path : null,
     video_4k_path: hasSub ? item.video_4k_path : null,
   }));

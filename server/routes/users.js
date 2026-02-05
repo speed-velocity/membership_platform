@@ -57,4 +57,33 @@ router.get('/dashboard', authMiddleware, (req, res) => {
   });
 });
 
+router.get('/watchlist', authMiddleware, (req, res) => {
+  const rows = db.prepare(`
+    SELECT c.*
+    FROM watchlist w
+    JOIN content c ON c.id = w.content_id
+    WHERE w.user_id = ?
+    ORDER BY w.created_at DESC
+  `).all(req.user.id);
+  res.json({ content: rows });
+});
+
+router.post('/watchlist', authMiddleware, (req, res) => {
+  const { contentId } = req.body || {};
+  if (!contentId) return res.status(400).json({ error: 'contentId required' });
+  const exists = db.prepare('SELECT id FROM content WHERE id = ?').get(contentId);
+  if (!exists) return res.status(404).json({ error: 'Content not found' });
+  try {
+    db.prepare('INSERT INTO watchlist (user_id, content_id) VALUES (?, ?)').run(req.user.id, contentId);
+  } catch (e) {
+    // ignore duplicate
+  }
+  res.json({ ok: true });
+});
+
+router.delete('/watchlist/:contentId', authMiddleware, (req, res) => {
+  db.prepare('DELETE FROM watchlist WHERE user_id = ? AND content_id = ?').run(req.user.id, req.params.contentId);
+  res.json({ ok: true });
+});
+
 module.exports = router;

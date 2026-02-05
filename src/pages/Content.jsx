@@ -20,6 +20,34 @@ export default function Content() {
     }).finally(() => setLoading(false));
   }, [filter]);
 
+  const toggleFavorite = async (e, item) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const next = !item.isFavorite;
+    setContent((prev) =>
+      prev.map((c) => (c.id === item.id ? { ...c, isFavorite: next } : c))
+    );
+    try {
+      if (next) {
+        await fetch(`${API}/users/watchlist`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ contentId: item.id }),
+        });
+      } else {
+        await fetch(`${API}/users/watchlist/${item.id}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        });
+      }
+    } catch {
+      setContent((prev) =>
+        prev.map((c) => (c.id === item.id ? { ...c, isFavorite: !next } : c))
+      );
+    }
+  };
+
   if (loading) return <div className="loading-screen"><div className="loader" /></div>;
 
   return (
@@ -55,6 +83,14 @@ export default function Content() {
                   <span>◆</span>
                 </div>
               )}
+              <button
+                type="button"
+                className={`fav-btn ${item.isFavorite ? 'active' : ''}`}
+                onClick={(e) => toggleFavorite(e, item)}
+                aria-label="Toggle favorite"
+              >
+                {item.isFavorite ? '★' : '☆'}
+              </button>
               {!item.canAccess && (
                 <div className="content-lock">
                   <span>🔒</span>
