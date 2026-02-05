@@ -1,19 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Sora:wght@400;500;600&display=swap');
 
 :root {
-  --bg-dark: #0b0b0c;
-  --bg-card: rgba(14, 14, 16, 0.95);
-  --bg-glass: rgba(14, 14, 16, 0.85);
-  --neon-cyan: #7f2bff;
-  --neon-magenta: #8b4dff;
-  --neon-purple: #7f2bff;
-  --neon-blue: #6a3bff;
-  --text-primary: #f7f7f8;
-  --text-muted: #b8b8c0;
-  --border-glow: rgba(127, 43, 255, 0.3);
-  --shadow-glow: 0 14px 40px rgba(0, 0, 0, 0.6);
-  --font-display: 'Inter', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --bg-dark: #0a0a0b;
+  --bg-card: rgba(16, 17, 19, 0.96);
+  --bg-glass: rgba(16, 17, 19, 0.88);
+  --neon-cyan: #41d1ff;
+  --neon-magenta: #f0a35c;
+  --neon-purple: #41d1ff;
+  --neon-blue: #2bb0e3;
+  --text-primary: #f4f4f6;
+  --text-muted: #b4b6bf;
+  --border-glow: rgba(65, 209, 255, 0.25);
+  --shadow-glow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Sora', sans-serif;
 }
 
 * {
@@ -36,10 +36,10 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(900px 620px at 68% 18%, rgba(127, 43, 255, 0.22), transparent 62%),
-    radial-gradient(720px 520px at 25% 82%, rgba(98, 86, 210, 0.14), transparent 62%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 45%);
-  animation: slow-drift 24s ease-in-out infinite alternate;
+    radial-gradient(820px 520px at 68% 18%, rgba(65, 209, 255, 0.16), transparent 60%),
+    radial-gradient(720px 520px at 22% 82%, rgba(240, 163, 92, 0.14), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 55%);
+  animation: slow-drift 28s ease-in-out infinite alternate;
   pointer-events: none;
   z-index: 0;
 }
@@ -49,10 +49,11 @@ body::after {
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 96px 96px;
-  opacity: 0.16;
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0 2px, transparent 2px 8px);
+  background-size: 120px 120px, 120px 120px, 10px 10px;
+  opacity: 0.12;
   pointer-events: none;
   z-index: 0;
 }
@@ -84,12 +85,12 @@ a:hover {
   background: var(--bg-glass);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
   padding: 1.5rem;
   box-shadow: var(--shadow-glow);
   transform-style: preserve-3d;
-  transition: border-color 0.2s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  transition: border-color 0.2s ease, transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
   animation: card-float 8s ease-in-out infinite;
 }
 
@@ -97,15 +98,15 @@ a:hover {
   content: '';
   position: absolute;
   inset: 1px;
-  border-radius: 9px;
-  background: linear-gradient(120deg, rgba(255, 255, 255, 0.04), transparent 35%);
+  border-radius: 13px;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.06), transparent 45%);
   opacity: 0.65;
   pointer-events: none;
 }
 
 .glass-card:hover {
-  border-color: rgba(127, 43, 255, 0.45);
-  transform: translateY(-4px) rotateX(0.8deg) rotateY(-0.8deg);
+  border-color: rgba(65, 209, 255, 0.35);
+  transform: translateY(-6px) rotateX(0.6deg) rotateY(-0.6deg);
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.65);
 }
 
@@ -122,9 +123,9 @@ a:hover {
 }
 
 .btn-primary {
-  background: #ffffff;
-  color: #0b0b0c;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(135deg, #ffffff, #e9edf3);
+  color: #0a0a0b;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
 }
 
 .btn-primary:hover {
@@ -186,8 +187,8 @@ input, textarea, select {
 
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: rgba(127, 43, 255, 0.6);
-  box-shadow: 0 0 0 3px rgba(127, 43, 255, 0.2);
+  border-color: rgba(65, 209, 255, 0.6);
+  box-shadow: 0 0 0 3px rgba(65, 209, 255, 0.2);
 }
 
 input::placeholder, textarea::placeholder {
