@@ -34,7 +34,10 @@ export default function Login() {
         }
         navigate('/dashboard');
       } else if (otpStage === 'request') {
-        await requestOtp(email);
+        const timeout = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('OTP request timed out. Try again.')), 10000)
+        );
+        await Promise.race([requestOtp(email), timeout]);
         setOtpStage('verify');
       } else {
         await verifyOtp(email, otp);
@@ -85,7 +88,11 @@ export default function Login() {
           )}
           <button type="submit" className="btn-glow btn-primary" disabled={loading}>
             {loading
-              ? 'Signing in...'
+              ? mode === 'password'
+                ? 'Signing in...'
+                : otpStage === 'request'
+                  ? 'Sending code...'
+                  : 'Verifying...'
               : mode === 'password'
                 ? 'Sign In'
                 : otpStage === 'request'
