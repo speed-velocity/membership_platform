@@ -75,15 +75,13 @@ export default function Login() {
             />
           ) : (
             <>
-              {otpStage === 'verify' && (
-                <input
-                  type="text"
-                  placeholder="6-digit code"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  required
-                />
-              )}
+              <input
+                type="text"
+                placeholder="6-digit code"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                required={otpStage === 'verify'}
+              />
             </>
           )}
           <button type="submit" className="btn-glow btn-primary" disabled={loading}>
@@ -114,6 +112,20 @@ export default function Login() {
             {mode === 'password' ? 'Use Email OTP' : 'Use Password'}
           </button>
         </div>
+        {mode === 'otp' && otpStage === 'request' && (
+          <div className="auth-switch">
+            <button
+              type="button"
+              className="btn-glow btn-secondary"
+              onClick={() => {
+                setOtpStage('verify');
+                setError('');
+              }}
+            >
+              I already have a code
+            </button>
+          </div>
+        )}
         <p className="auth-footer">
           Don't have an account? <Link to="/signup">Sign up</Link>
           {' · '}
