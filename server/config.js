@@ -10,6 +10,10 @@ module.exports = {
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
   },
+  resend: {
+    apiKey: process.env.RESEND_API_KEY || '',
+    from: process.env.RESEND_FROM || '',
+  },
   notificationEmail: process.env.NOTIFICATION_EMAIL || process.env.ADMIN_EMAIL || 'admin@platform.com',
   appUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
   showResetLink: process.env.SHOW_RESET_LINK === 'true',

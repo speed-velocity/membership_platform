@@ -10,6 +10,7 @@ let transporter = null;
 
 function getTransporter() {
   if (transporter) return transporter;
+  if (config.resend.apiKey) return null;
   const { host, port, secure, user, pass } = config.smtp;
   if (!host || !user || !pass) return null;
   transporter = nodemailer.createTransport({
@@ -21,12 +22,45 @@ function getTransporter() {
   return transporter;
 }
 
+async function sendViaResend(to, subject, text, html) {
+  if (!config.resend.apiKey || !config.resend.from) return false;
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${config.resend.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: config.resend.from,
+        to,
+        subject,
+        text: text || html,
+        html: html ? html.replace(/\n/g, '<br>') : undefined,
+      }),
+    });
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('Resend error:', errText);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Resend send error:', err.message);
+    return false;
+  }
+}
+
 function logFallback(to, subject, body) {
   const entry = `[${new Date().toISOString()}] EMAIL (SMTP not configured)\nTo: ${to}\nSubject: ${subject}\n\n${body}\n---\n`;
   fs.appendFileSync(path.join(LOG_DIR, 'emails.log'), entry);
 }
 
 async function sendEmail(to, subject, text, html) {
+  if (config.resend.apiKey) {
+    const sent = await sendViaResend(to, subject, text, html);
+    if (sent) return true;
+  }
   const transport = getTransporter();
   if (transport) {
     try {
