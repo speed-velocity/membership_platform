@@ -10,7 +10,9 @@ const config = require('../config');
 const router = express.Router();
 
 router.post('/register', (req, res) => {
-  const { email, password, fullName } = req.body;
+  let { email, password, fullName } = req.body;
+  email = (email || '').trim().toLowerCase();
+  fullName = (fullName || '').trim();
   if (!email || !password || !fullName) {
     return res.status(400).json({ error: 'Name, email and password required' });
   }
@@ -39,7 +41,8 @@ router.post('/register', (req, res) => {
 });
 
 router.post('/login', (req, res) => {
-  const { email, password } = req.body;
+  let { email, password } = req.body;
+  email = (email || '').trim().toLowerCase();
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password required' });
   }
@@ -65,7 +68,8 @@ router.post('/login', (req, res) => {
 });
 
 router.post('/admin-login', (req, res) => {
-  const { email, password } = req.body;
+  let { email, password } = req.body;
+  email = (email || '').trim().toLowerCase();
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password required' });
   }
@@ -100,7 +104,8 @@ router.post('/logout', (req, res) => {
 });
 
 router.post('/forgot-password', async (req, res) => {
-  const { email } = req.body || {};
+  let { email } = req.body || {};
+  email = (email || '').trim().toLowerCase();
   if (!email) return res.status(400).json({ error: 'Email required' });
   const user = db.prepare('SELECT id, email FROM users WHERE email = ?').get(email);
   if (user) {
@@ -128,7 +133,8 @@ router.post('/forgot-password', async (req, res) => {
 
 // Insecure direct reset (no email). Use only if you accept the risk.
 router.post('/direct-reset', (req, res) => {
-  const { email, password, confirmPassword } = req.body || {};
+  let { email, password, confirmPassword } = req.body || {};
+  email = (email || '').trim().toLowerCase();
   if (!email || !password || !confirmPassword) {
     return res.status(400).json({ error: 'Email and passwords required' });
   }
