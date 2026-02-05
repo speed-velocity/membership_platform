@@ -10,7 +10,6 @@ let transporter = null;
 
 function getTransporter() {
   if (transporter) return transporter;
-  if (config.resend.apiKey) return null;
   const { host, port, secure, user, pass } = config.smtp;
   if (!host || !user || !pass) return null;
   transporter = nodemailer.createTransport({
