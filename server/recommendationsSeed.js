@@ -27,13 +27,19 @@ function normalizeTitle(value) {
 async function seedRecommendations(db) {
   for (const group of GENRE_RECOMMENDATIONS) {
     for (const item of group.items) {
-      await db.run(
-        `INSERT INTO weekly_recommendations (genre, title, kind, poster_path)
-         VALUES ($1, $2, $3, $4)
-         ON CONFLICT (genre, title, kind)
-         DO UPDATE SET poster_path = EXCLUDED.poster_path`,
-        [group.genre, item.title, item.kind, item.posterPath || null]
-      );
+      try {
+        await db.run(
+          `INSERT INTO weekly_recommendations (genre, title, kind, poster_path)
+           VALUES ($1, $2, $3, $4)
+           ON CONFLICT (genre, title, kind)
+           DO UPDATE SET poster_path = EXCLUDED.poster_path`,
+          [group.genre, item.title, item.kind, item.posterPath || null]
+        );
+      } catch (error) {
+        if (error?.code !== '23505') {
+          throw error;
+        }
+      }
     }
 
     const canonical = new Map();
