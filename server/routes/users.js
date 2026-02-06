@@ -91,10 +91,44 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
   const genre = profile?.favorite_genre;
   if (!genre) return res.json({ genre: null, content: [] });
   const rows = await db.all(
-    'SELECT id, title, category, thumbnail_path, created_at FROM content WHERE category = $1 ORDER BY created_at DESC LIMIT 8',
-    [genre]
+    `
+    SELECT c.id, c.title, c.category, c.thumbnail_path, c.created_at,
+           rl.id as like_id
+    FROM content c
+    LEFT JOIN recommendation_likes rl ON rl.content_id = c.id AND rl.user_id = $2
+    WHERE c.category = $1
+    ORDER BY c.created_at DESC
+    LIMIT 8
+  `,
+    [genre, req.user.id]
   );
-  res.json({ genre, content: rows });
+  const content = rows.map((r) => ({
+    id: r.id,
+    title: r.title,
+    category: r.category,
+    thumbnail_path: r.thumbnail_path,
+    created_at: r.created_at,
+    liked: !!r.like_id,
+  }));
+  res.json({ genre, content });
+});
+
+router.post('/recommendations/:id/like', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const exists = await db.get('SELECT id FROM content WHERE id = $1', [id]);
+  if (!exists) return res.status(404).json({ error: 'Content not found' });
+  try {
+    await db.run('INSERT INTO recommendation_likes (user_id, content_id) VALUES ($1, $2)', [req.user.id, id]);
+  } catch (e) {
+    // ignore duplicate
+  }
+  res.json({ ok: true });
+});
+
+router.delete('/recommendations/:id/like', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  await db.run('DELETE FROM recommendation_likes WHERE user_id = $1 AND content_id = $2', [req.user.id, id]);
+  res.json({ ok: true });
 });
 
 router.get('/watchlist', authMiddleware, async (req, res) => {

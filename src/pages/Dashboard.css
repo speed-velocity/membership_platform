@@ -102,8 +102,8 @@
 .weekly-card {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.6rem;
+  gap: 0.65rem;
+  padding: 0.65rem;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.03);
   color: var(--text-primary);
@@ -115,7 +115,7 @@
   border: 1px solid rgba(65, 209, 255, 0.3);
 }
 
-.weekly-card img {
+.weekly-thumb img {
   width: 100%;
   height: 110px;
   object-fit: cover;
@@ -131,4 +131,57 @@
   background: rgba(65, 209, 255, 0.08);
   color: var(--text-muted);
   font-size: 0.85rem;
+}
+
+.weekly-thumb {
+  display: block;
+}
+
+.weekly-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.weekly-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.weekly-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-xs {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.75rem;
+}
+
+.btn-like {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-like:hover {
+  border-color: rgba(65, 209, 255, 0.4);
+  color: var(--neon-cyan);
+}
+
+.btn-like.active {
+  background: rgba(65, 209, 255, 0.18);
+  border-color: rgba(65, 209, 255, 0.6);
+  color: #fff;
+}
+
+.weekly-error {
+  font-size: 0.75rem;
+  color: #ff8da3;
 }

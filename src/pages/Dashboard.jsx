@@ -9,6 +9,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState([]);
   const [recGenre, setRecGenre] = useState('');
+  const [recStatus, setRecStatus] = useState({});
 
   useEffect(() => {
     Promise.all([
@@ -22,6 +23,47 @@ export default function Dashboard() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  const requestRecommendation = async (item) => {
+    setRecStatus((s) => ({ ...s, [item.id]: { ...(s[item.id] || {}), requesting: true, error: '' } }));
+    try {
+      const res = await fetch(`${API}/requests`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ title: item.title, message: 'Requested from Weekly Picks' }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Request failed');
+      setRecStatus((s) => ({ ...s, [item.id]: { ...(s[item.id] || {}), requested: true, requesting: false } }));
+    } catch (e) {
+      setRecStatus((s) => ({ ...s, [item.id]: { ...(s[item.id] || {}), requesting: false, error: e.message } }));
+    }
+  };
+
+  const toggleLike = async (item) => {
+    const next = !item.liked;
+    setRecommendations((prev) =>
+      prev.map((r) => (r.id === item.id ? { ...r, liked: next } : r))
+    );
+    try {
+      if (next) {
+        await fetch(`${API}/users/recommendations/${item.id}/like`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+      } else {
+        await fetch(`${API}/users/recommendations/${item.id}/like`, {
+          method: 'DELETE',
+          credentials: 'include',
+        });
+      }
+    } catch (e) {
+      setRecommendations((prev) =>
+        prev.map((r) => (r.id === item.id ? { ...r, liked: !next } : r))
+      );
+    }
+  };
 
   if (loading) return <div className="loading-screen"><div className="loader" /></div>;
 
@@ -104,14 +146,36 @@ export default function Dashboard() {
           {recommendations.length > 0 ? (
             <div className="weekly-grid">
               {recommendations.map((item) => (
-                <Link key={item.id} to={`/content/${item.id}`} className="weekly-card">
-                  {item.thumbnail_path ? (
-                    <img src={`/${item.thumbnail_path}`} alt={item.title} />
-                  ) : (
-                    <div className="weekly-placeholder">Movie</div>
-                  )}
-                  <span>{item.title}</span>
-                </Link>
+                <div key={item.id} className="weekly-card">
+                  <Link to={`/content/${item.id}`} className="weekly-thumb">
+                    {item.thumbnail_path ? (
+                      <img src={`/${item.thumbnail_path}`} alt={item.title} />
+                    ) : (
+                      <div className="weekly-placeholder">Movie</div>
+                    )}
+                  </Link>
+                  <div className="weekly-meta">
+                    <span className="weekly-title">{item.title}</span>
+                    <div className="weekly-actions">
+                      <button
+                        className="btn-glow btn-secondary btn-xs"
+                        onClick={() => requestRecommendation(item)}
+                        disabled={recStatus[item.id]?.requesting}
+                      >
+                        {recStatus[item.id]?.requested ? 'Requested' : 'Request'}
+                      </button>
+                      <button
+                        className={`btn-like ${item.liked ? 'active' : ''}`}
+                        onClick={() => toggleLike(item)}
+                      >
+                        {item.liked ? 'Liked' : 'Like'}
+                      </button>
+                    </div>
+                    {recStatus[item.id]?.error && (
+                      <span className="weekly-error">{recStatus[item.id].error}</span>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           ) : (
