@@ -11,11 +11,20 @@ export default function WeeklyPicks() {
   const [loading, setLoading] = useState(true);
   const [recStatus, setRecStatus] = useState({});
 
+  const normalizeTitle = (value) =>
+    String(value || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '');
+
   useEffect(() => {
     fetch(`${API}/users/recommendations`, { credentials: 'include' })
       .then((r) => r.json())
       .then((rec) => {
-        setRecommendations(rec?.content || []);
+        const blocked = new Set(['rananaidu', 'ranaraidu']);
+        const filtered = (rec?.content || []).filter(
+          (item) => !blocked.has(normalizeTitle(item.title))
+        );
+        setRecommendations(filtered);
         setRecGenre(rec?.genre || '');
       })
       .finally(() => setLoading(false));
