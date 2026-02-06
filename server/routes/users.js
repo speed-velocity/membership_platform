@@ -96,7 +96,7 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
            rl.id as like_id
     FROM weekly_recommendations r
     LEFT JOIN weekly_recommendation_likes rl ON rl.recommendation_id = r.id AND rl.user_id = $2
-    WHERE r.genre = $1
+    WHERE LOWER(r.genre) = LOWER($1)
     ORDER BY r.created_at DESC
   `,
     [genre, req.user.id]
