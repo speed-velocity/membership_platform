@@ -1,6 +1,7 @@
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const config = require('./config');
+const { seedRecommendations } = require('./recommendationsSeed');
 
 let pool;
 
@@ -197,6 +198,8 @@ async function initDb() {
     );
     console.log(`Admin created: ${adminEmail}`);
   }
+
+  await seedRecommendations({ get, run });
 }
 
 module.exports = { initDb, query, get, all, run };

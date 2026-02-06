@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import './Dashboard.css';
 import './WeeklyPicks.css';
 
@@ -71,13 +70,13 @@ export default function WeeklyPicks() {
         <div className="weekly-grid">
           {recommendations.map((item) => (
             <div key={item.id} className="weekly-card">
-              <Link to={`/content/${item.id}`} className="weekly-thumb">
+              <div className="weekly-thumb">
                 {item.thumbnail_path ? (
                   <img src={`/${item.thumbnail_path}`} alt={item.title} />
                 ) : (
-                  <div className="weekly-placeholder">Movie</div>
+                  <div className="weekly-placeholder">Poster</div>
                 )}
-              </Link>
+              </div>
               <div className="weekly-meta">
                 <span className="weekly-title">{item.title}</span>
                 <div className="weekly-actions">
