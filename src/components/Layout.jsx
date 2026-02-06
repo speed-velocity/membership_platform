@@ -6,6 +6,7 @@ import './Layout.css';
 export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = React.useState(false);
 
   const handleLogout = () => {
     logout();
@@ -30,7 +31,54 @@ export default function Layout() {
 
   return (
     <div className="layout">
+      <div
+        className={`side-backdrop ${menuOpen ? 'open' : ''}`}
+        onClick={() => setMenuOpen(false)}
+      />
+      <aside className={`side-panel ${menuOpen ? 'open' : ''}`}>
+        <div className="side-panel-header">
+          <span className="side-title">Movie Mayhem</span>
+          <button className="side-close" onClick={() => setMenuOpen(false)} aria-label="Close menu">
+            ×
+          </button>
+        </div>
+        <div className="side-panel-body">
+          {user?.role === 'user' && (
+            <button
+              className="btn-glow btn-secondary btn-sm"
+              onClick={() => {
+                setMenuOpen(false);
+                navigate('/payment');
+              }}
+            >
+              Manage Subscription
+            </button>
+          )}
+          <button
+            className="btn-glow btn-secondary btn-sm"
+            onClick={() => {
+              setMenuOpen(false);
+              handleLogout();
+            }}
+          >
+            Logout
+          </button>
+          {user?.role === 'user' && (
+            <button className="btn-link-danger" onClick={handleDeleteAccount}>
+              Delete account
+            </button>
+          )}
+        </div>
+      </aside>
+
       <nav className="navbar">
+        <button
+          className="menu-btn"
+          aria-label="Open menu"
+          onClick={() => setMenuOpen(true)}
+        >
+          ☰
+        </button>
         <NavLink to="/dashboard" className="logo">
           <span className="logo-icon">◆</span>
           <span>Movie Mayhem</span>
@@ -39,20 +87,10 @@ export default function Layout() {
           {user?.role === 'user' && <NavLink to="/dashboard">Dashboard</NavLink>}
           {user?.role === 'user' && <NavLink to="/watchlist">Watchlist</NavLink>}
           {user?.role === 'user' && <NavLink to="/requests">Requests</NavLink>}
-          {user?.role === 'admin' && (
-            <NavLink to="/admin">Admin</NavLink>
-          )}
+          {user?.role === 'admin' && <NavLink to="/admin">Admin</NavLink>}
         </div>
         <div className="nav-user">
           <span className="user-email">{user?.email}</span>
-          <div className="nav-actions">
-            <button className="btn-glow btn-secondary btn-sm" onClick={handleLogout}>Logout</button>
-            {user?.role === 'user' && (
-              <button className="btn-link-danger" onClick={handleDeleteAccount}>
-                Delete account
-              </button>
-            )}
-          </div>
         </div>
       </nav>
       <main className="main-content">
