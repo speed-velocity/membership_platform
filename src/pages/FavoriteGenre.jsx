@@ -4,17 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import './Auth.css';
 
 const GENRES = [
-  { id: 'romance', label: 'Romance', icon: '♥', blurb: 'Love stories & warm moments' },
-  { id: 'action', label: 'Action', icon: '⚡', blurb: 'Blasts, chases & intensity' },
-  { id: 'thriller', label: 'Thriller', icon: '◼', blurb: 'Tension & edge-of-seat' },
-  { id: 'drama', label: 'Drama', icon: '◐', blurb: 'Emotions & character arcs' },
-  { id: 'comedy', label: 'Comedy', icon: '✿', blurb: 'Light, fun & clever' },
-  { id: 'horror', label: 'Horror', icon: '✶', blurb: 'Dark, eerie & spooky' },
-  { id: 'scifi', label: 'Sci-Fi', icon: '◎', blurb: 'Futuristic & mind-bending' },
-  { id: 'fantasy', label: 'Fantasy', icon: '✦', blurb: 'Magic & wonder' },
-  { id: 'adventure', label: 'Adventure', icon: '▲', blurb: 'Quest & exploration' },
-  { id: 'animation', label: 'Animation', icon: '●', blurb: 'Stylized & artistic' },
-  { id: 'documentary', label: 'Documentary', icon: '▣', blurb: 'Stories from reality' },
+  { id: 'romance', label: 'Romance', icon: 'R', blurb: 'Love stories & warm moments' },
+  { id: 'action', label: 'Action', icon: 'A', blurb: 'Blasts, chases & intensity' },
+  { id: 'thriller', label: 'Thriller', icon: 'T', blurb: 'Tension & edge-of-seat' },
+  { id: 'comedy', label: 'Comedy', icon: 'C', blurb: 'Light, fun & clever' },
+  { id: 'horror', label: 'Horror', icon: 'H', blurb: 'Dark, eerie & spooky' },
+  { id: 'scifi', label: 'Sci-Fi', icon: 'S', blurb: 'Futuristic & mind-bending' },
 ];
 
 const PARTICLES = [
