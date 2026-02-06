@@ -2,6 +2,7 @@ const ACTION_RECOMMENDATIONS = [
   { title: 'Raid Redemption', kind: 'Movie', posterPath: 'posters/action/raid-redemption.jpg' },
   { title: 'Oldboy', kind: 'Movie', posterPath: 'posters/action/oldboy.jpg' },
   { title: 'Marco', kind: 'Movie', posterPath: 'posters/action/marco.jpg' },
+  { title: 'HIT-The third case', kind: 'Movie', posterPath: 'posters/action/hit-the-third-case.jpg' },
   { title: 'Dhurandhar', kind: 'Movie', posterPath: 'posters/action/dhurandhar.jpg' },
   { title: 'WAR', kind: 'Movie', posterPath: 'posters/action/war.jpg' },
   { title: 'Fight club', kind: 'Movie', posterPath: 'posters/action/fight-club.jpg' },
@@ -12,6 +13,7 @@ const ACTION_RECOMMENDATIONS = [
   { title: 'Paatal lok', kind: 'Series', posterPath: 'posters/action/paatal-lok.jpg' },
   { title: 'The Terminal List', kind: 'Series', posterPath: 'posters/action/the-terminal-list.jpg' },
   { title: 'Spartacus', kind: 'Series', posterPath: 'posters/action/spartacus.jpg' },
+  { title: 'Rana Naidu', kind: 'Series', posterPath: 'posters/action/rana-naidu.jpg' },
 ];
 
 const GENRE_RECOMMENDATIONS = [

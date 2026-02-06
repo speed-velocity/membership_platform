@@ -123,8 +123,6 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
     FROM weekly_recommendations r
     LEFT JOIN weekly_recommendation_likes rl ON rl.recommendation_id = r.id AND rl.user_id = $2
     WHERE LOWER(r.genre) = LOWER($1)
-      AND regexp_replace(lower(r.title), '[^a-z0-9]+', '', 'g')
-        NOT IN ('rananaidu', 'ranaraidu', 'hitthethirdcase')
     ORDER BY lower(trim(r.kind)),
              regexp_replace(lower(r.title), '[^a-z0-9]+', '', 'g'),
              (r.poster_path IS NOT NULL) DESC,

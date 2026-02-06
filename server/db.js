@@ -193,7 +193,9 @@ async function initDb() {
     WITH ranked AS (
       SELECT id,
              row_number() OVER (
-               PARTITION BY lower(trim(genre)), lower(trim(title)), lower(trim(kind))
+               PARTITION BY lower(trim(genre)),
+                            lower(trim(kind)),
+                            regexp_replace(lower(title), '[^a-z0-9]+', '', 'g')
                ORDER BY (poster_path IS NOT NULL) DESC, created_at DESC, id DESC
              ) AS rn
       FROM weekly_recommendations
@@ -203,8 +205,12 @@ async function initDb() {
   `);
 
   await query(`
-    CREATE UNIQUE INDEX IF NOT EXISTS weekly_reco_unique_ci
-    ON weekly_recommendations (LOWER(TRIM(genre)), LOWER(TRIM(title)), LOWER(TRIM(kind)));
+    CREATE UNIQUE INDEX IF NOT EXISTS weekly_reco_unique_norm
+    ON weekly_recommendations (
+      LOWER(TRIM(genre)),
+      LOWER(TRIM(kind)),
+      regexp_replace(lower(title), '[^a-z0-9]+', '', 'g')
+    );
   `);
 
   const requestLimit = await get('SELECT value FROM settings WHERE key = $1', ['request_limit_per_12h']);
@@ -229,12 +235,6 @@ async function initDb() {
   }
 
   await seedRecommendations({ get, run, all });
-
-  await query(`
-    DELETE FROM weekly_recommendations
-    WHERE regexp_replace(lower(title), '[^a-z0-9]+', '', 'g')
-      IN ('rananaidu', 'ranaraidu', 'hitthethirdcase');
-  `);
 }
 
 module.exports = { initDb, query, get, all, run };
