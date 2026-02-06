@@ -189,6 +189,24 @@ async function initDb() {
     CREATE INDEX IF NOT EXISTS idx_weekly_likes_reco ON weekly_recommendation_likes(recommendation_id);
   `);
 
+  await query(`
+    WITH ranked AS (
+      SELECT id,
+             row_number() OVER (
+               PARTITION BY lower(trim(genre)), lower(trim(title)), lower(trim(kind))
+               ORDER BY (poster_path IS NOT NULL) DESC, created_at DESC, id DESC
+             ) AS rn
+      FROM weekly_recommendations
+    )
+    DELETE FROM weekly_recommendations
+    WHERE id IN (SELECT id FROM ranked WHERE rn > 1);
+  `);
+
+  await query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS weekly_reco_unique_ci
+    ON weekly_recommendations (LOWER(TRIM(genre)), LOWER(TRIM(title)), LOWER(TRIM(kind)));
+  `);
+
   const requestLimit = await get('SELECT value FROM settings WHERE key = $1', ['request_limit_per_12h']);
   if (!requestLimit) {
     await query("INSERT INTO settings (key, value) VALUES ('request_limit_per_12h', '2')");
