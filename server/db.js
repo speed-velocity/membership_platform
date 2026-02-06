@@ -229,6 +229,11 @@ async function initDb() {
   }
 
   await seedRecommendations({ get, run, all });
+
+  await query(`
+    DELETE FROM weekly_recommendations
+    WHERE regexp_replace(lower(title), '[^a-z0-9]+', '', 'g') IN ('rananaidu', 'ranaraidu');
+  `);
 }
 
 module.exports = { initDb, query, get, all, run };
