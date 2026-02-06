@@ -25,11 +25,14 @@ import AdminLogins from './pages/admin/AdminLogins';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminActivity from './pages/admin/AdminActivity';
 
-function ProtectedRoute({ children, adminOnly }) {
+function ProtectedRoute({ children, adminOnly, requireGenre = true }) {
   const { user, loading } = useAuth();
   if (loading) return <div className="loading-screen"><div className="loader" /></div>;
   if (!user) return <Navigate to={adminOnly ? "/admin/login" : "/login"} replace />;
   if (adminOnly && user.role !== 'admin') return <Navigate to="/dashboard" replace />;
+  if (requireGenre && user.role !== 'admin' && !user.favoriteGenre) {
+    return <Navigate to="/onboarding/genre" replace />;
+  }
   return children;
 }
 
@@ -60,7 +63,7 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/onboarding/genre" element={<ProtectedRoute><FavoriteGenre /></ProtectedRoute>} />
+      <Route path="/onboarding/genre" element={<ProtectedRoute requireGenre={false}><FavoriteGenre /></ProtectedRoute>} />
       <Route path="/" element={<Layout />}>
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
