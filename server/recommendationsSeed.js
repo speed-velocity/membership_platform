@@ -13,7 +13,6 @@ const ACTION_RECOMMENDATIONS = [
   { title: 'Paatal lok', kind: 'Series', posterPath: 'posters/action/paatal-lok.jpg' },
   { title: 'The Terminal List', kind: 'Series', posterPath: 'posters/action/the-terminal-list.jpg' },
   { title: 'Spartacus', kind: 'Series', posterPath: 'posters/action/spartacus.jpg' },
-  { title: 'Rana Naidu', kind: 'Series', posterPath: 'posters/action/rana-naidu.jpg' },
 ];
 
 const GENRE_RECOMMENDATIONS = [
@@ -28,6 +27,9 @@ function normalizeTitle(value) {
 
 async function seedRecommendations(db) {
   for (const group of GENRE_RECOMMENDATIONS) {
+    const blocked = new Set(['rananaidu', 'ranaraidu']);
+    const blockedKinds = new Set(['series', 'movie']);
+
     for (const item of group.items) {
       await db.run(
         `INSERT INTO weekly_recommendations (genre, title, kind, poster_path)
@@ -53,6 +55,13 @@ async function seedRecommendations(db) {
     for (const row of existing) {
       const key = `${row.kind}|${normalizeTitle(row.title)}`;
       const match = canonical.get(key);
+      const normalizedTitle = normalizeTitle(row.title);
+      const normalizedKind = String(row.kind || '').toLowerCase().trim();
+
+      if (blocked.has(normalizedTitle) && blockedKinds.has(normalizedKind)) {
+        await db.run('DELETE FROM weekly_recommendations WHERE id = $1', [row.id]);
+        continue;
+      }
 
       if (!match) {
         await db.run('DELETE FROM weekly_recommendations WHERE id = $1', [row.id]);

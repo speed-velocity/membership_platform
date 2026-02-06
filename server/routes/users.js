@@ -29,6 +29,8 @@ const ACTION_POSTERS = {
   'series|ranaraidu': 'posters/action/rana-naidu.jpg',
 };
 
+const BLOCKED_RECOMMENDATIONS = new Set(['rananaidu', 'ranaraidu']);
+
 async function getActiveSubscription(userId) {
   const sub = await db.get(
     `
@@ -130,6 +132,9 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
   for (const row of rows) {
     const kindKey = String(row.kind || '').trim().toLowerCase();
     const key = `${kindKey}|${normalizeTitle(row.title)}`;
+    if (BLOCKED_RECOMMENDATIONS.has(normalizeTitle(row.title))) {
+      continue;
+    }
     const mappedPoster = ACTION_POSTERS[key];
     if ((!row.poster_path || row.poster_path !== mappedPoster) && mappedPoster) {
       row.poster_path = mappedPoster;
