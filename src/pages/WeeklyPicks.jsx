@@ -20,7 +20,7 @@ export default function WeeklyPicks() {
     fetch(`${API}/users/recommendations`, { credentials: 'include' })
       .then((r) => r.json())
       .then((rec) => {
-        const blocked = new Set(['rananaidu', 'ranaraidu']);
+        const blocked = new Set(['rananaidu', 'ranaraidu', 'hitthethirdcase']);
         const filtered = (rec?.content || []).filter(
           (item) => !blocked.has(normalizeTitle(item.title))
         );
