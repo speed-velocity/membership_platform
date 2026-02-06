@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './Dashboard.css';
 import './WeeklyPicks.css';
 
@@ -65,41 +66,84 @@ export default function WeeklyPicks() {
 
   return (
     <div className="weekly-page animate-fade-in">
-      <h1 className="page-title">Weekly Picks {recGenre ? `· ${recGenre}` : ''}</h1>
+      <h1 className="page-title">Weekly Picks {recGenre ? `- ${recGenre}` : ''}</h1>
       {recommendations.length > 0 ? (
-        <div className="weekly-grid">
-          {recommendations.map((item) => (
-            <div key={item.id} className="weekly-card">
-              <div className="weekly-thumb">
-                {item.thumbnail_path ? (
-                  <img src={`/${item.thumbnail_path}`} alt={item.title} />
-                ) : (
-                  <div className="weekly-placeholder">{item.kind || 'Poster'}</div>
-                )}
-              </div>
-              <div className="weekly-meta">
-                <span className="weekly-title">{item.title}</span>
-                <div className="weekly-actions">
-                  <button
-                    className="btn-glow btn-secondary btn-xs"
-                    onClick={() => requestRecommendation(item)}
-                    disabled={recStatus[item.id]?.requesting}
-                  >
-                    {recStatus[item.id]?.requested ? 'Requested' : 'Request'}
-                  </button>
-                  <button
-                    className={`btn-like ${item.liked ? 'active' : ''}`}
-                    onClick={() => toggleLike(item)}
-                  >
-                    {item.liked ? 'Liked' : 'Like'}
-                  </button>
+        <div className="weekly-columns">
+          <div className="weekly-section">
+            <h2 className="weekly-heading">Movies</h2>
+            <div className="weekly-grid">
+              {recommendations.filter((r) => r.kind === 'Movie').map((item) => (
+                <div key={item.id} className="weekly-card">
+                  <div className="weekly-thumb">
+                    {item.thumbnail_path ? (
+                      <img src={`/${item.thumbnail_path}`} alt={item.title} />
+                    ) : (
+                      <div className="weekly-placeholder">{item.kind || 'Poster'}</div>
+                    )}
+                  </div>
+                  <div className="weekly-meta">
+                    <span className="weekly-title">{item.title}</span>
+                    <div className="weekly-actions">
+                      <button
+                        className="btn-glow btn-secondary btn-xs"
+                        onClick={() => requestRecommendation(item)}
+                        disabled={recStatus[item.id]?.requesting}
+                      >
+                        {recStatus[item.id]?.requested ? 'Requested' : 'Request'}
+                      </button>
+                      <button
+                        className={`btn-like ${item.liked ? 'active' : ''}`}
+                        onClick={() => toggleLike(item)}
+                      >
+                        {item.liked ? 'Liked' : 'Like'}
+                      </button>
+                    </div>
+                    {recStatus[item.id]?.error && (
+                      <span className="weekly-error">{recStatus[item.id].error}</span>
+                    )}
+                  </div>
                 </div>
-                {recStatus[item.id]?.error && (
-                  <span className="weekly-error">{recStatus[item.id].error}</span>
-                )}
-              </div>
+              ))}
             </div>
-          ))}
+          </div>
+
+          <div className="weekly-section">
+            <h2 className="weekly-heading">Series</h2>
+            <div className="weekly-grid">
+              {recommendations.filter((r) => r.kind === 'Series').map((item) => (
+                <div key={item.id} className="weekly-card">
+                  <div className="weekly-thumb">
+                    {item.thumbnail_path ? (
+                      <img src={`/${item.thumbnail_path}`} alt={item.title} />
+                    ) : (
+                      <div className="weekly-placeholder">{item.kind || 'Poster'}</div>
+                    )}
+                  </div>
+                  <div className="weekly-meta">
+                    <span className="weekly-title">{item.title}</span>
+                    <div className="weekly-actions">
+                      <button
+                        className="btn-glow btn-secondary btn-xs"
+                        onClick={() => requestRecommendation(item)}
+                        disabled={recStatus[item.id]?.requesting}
+                      >
+                        {recStatus[item.id]?.requested ? 'Requested' : 'Request'}
+                      </button>
+                      <button
+                        className={`btn-like ${item.liked ? 'active' : ''}`}
+                        onClick={() => toggleLike(item)}
+                      >
+                        {item.liked ? 'Liked' : 'Like'}
+                      </button>
+                    </div>
+                    {recStatus[item.id]?.error && (
+                      <span className="weekly-error">{recStatus[item.id].error}</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       ) : (
         <div className="glass-card weekly-empty">
