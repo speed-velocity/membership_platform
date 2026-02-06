@@ -4,7 +4,7 @@ const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const config = require('./config');
 
-const dbPath = path.join(__dirname, '..', 'data', 'membership.db');
+const dbPath = process.env.DB_PATH || path.join(__dirname, '..', 'data', 'membership.db');
 const dataDir = path.dirname(dbPath);
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
