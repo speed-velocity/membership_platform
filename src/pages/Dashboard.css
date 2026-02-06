@@ -95,16 +95,16 @@
 
 .weekly-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
 }
 
 .weekly-card {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  padding: 0.65rem;
-  border-radius: 10px;
+  gap: 0.85rem;
+  padding: 0.85rem;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.03);
   color: var(--text-primary);
   transition: transform 0.2s ease, border-color 0.2s ease;
@@ -117,15 +117,16 @@
 
 .weekly-thumb img {
   width: 100%;
-  height: 110px;
-  object-fit: cover;
-  border-radius: 8px;
+  height: 240px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.25);
 }
 
 .weekly-placeholder {
   width: 100%;
-  height: 110px;
-  border-radius: 8px;
+  height: 240px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
   background: rgba(65, 209, 255, 0.08);
