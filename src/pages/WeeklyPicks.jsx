@@ -74,7 +74,7 @@ export default function WeeklyPicks() {
                 {item.thumbnail_path ? (
                   <img src={`/${item.thumbnail_path}`} alt={item.title} />
                 ) : (
-                  <div className="weekly-placeholder">Poster</div>
+                  <div className="weekly-placeholder">{item.kind || 'Poster'}</div>
                 )}
               </div>
               <div className="weekly-meta">

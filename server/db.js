@@ -142,14 +142,24 @@ async function initDb() {
       FOREIGN KEY (content_id) REFERENCES content(id)
     );
 
-    CREATE TABLE IF NOT EXISTS recommendation_likes (
+    CREATE TABLE IF NOT EXISTS weekly_recommendations (
+      id SERIAL PRIMARY KEY,
+      genre TEXT NOT NULL,
+      title TEXT NOT NULL,
+      kind TEXT NOT NULL,
+      poster_path TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(genre, title, kind)
+    );
+
+    CREATE TABLE IF NOT EXISTS weekly_recommendation_likes (
       id SERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL,
-      content_id INTEGER NOT NULL,
+      recommendation_id INTEGER NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE(user_id, content_id),
+      UNIQUE(user_id, recommendation_id),
       FOREIGN KEY (user_id) REFERENCES users(id),
-      FOREIGN KEY (content_id) REFERENCES content(id)
+      FOREIGN KEY (recommendation_id) REFERENCES weekly_recommendations(id)
     );
 
     CREATE TABLE IF NOT EXISTS account_deletion_requests (
@@ -174,8 +184,9 @@ async function initDb() {
     CREATE INDEX IF NOT EXISTS idx_email_otps_hash ON email_otps(otp_hash);
     CREATE INDEX IF NOT EXISTS idx_watchlist_user ON watchlist(user_id);
     CREATE INDEX IF NOT EXISTS idx_watchlist_content ON watchlist(content_id);
-    CREATE INDEX IF NOT EXISTS idx_reco_likes_user ON recommendation_likes(user_id);
-    CREATE INDEX IF NOT EXISTS idx_reco_likes_content ON recommendation_likes(content_id);
+    CREATE INDEX IF NOT EXISTS idx_weekly_reco_genre ON weekly_recommendations(genre);
+    CREATE INDEX IF NOT EXISTS idx_weekly_likes_user ON weekly_recommendation_likes(user_id);
+    CREATE INDEX IF NOT EXISTS idx_weekly_likes_reco ON weekly_recommendation_likes(recommendation_id);
   `);
 
   const requestLimit = await get('SELECT value FROM settings WHERE key = $1', ['request_limit_per_12h']);
