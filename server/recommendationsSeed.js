@@ -34,9 +34,28 @@ const ROMANCE_RECOMMENDATIONS = [
   { title: 'Broken But Beautiful', kind: 'Series', posterPath: 'posters/romance/broken-but-beautiful.jpg' },
 ];
 
+const THRILLER_RECOMMENDATIONS = [
+  { title: 'Se7en', kind: 'Movie', posterPath: 'posters/thriller/se7en.jpg' },
+  { title: 'Gone Girl', kind: 'Movie', posterPath: 'posters/thriller/gone-girl.jpg' },
+  { title: 'Shutter Island', kind: 'Movie', posterPath: 'posters/thriller/shutter-island.jpg' },
+  { title: 'The Silence of the Lambs', kind: 'Movie', posterPath: 'posters/thriller/silence-of-the-lambs.jpg' },
+  { title: 'Prisoners', kind: 'Movie', posterPath: 'posters/thriller/prisoners.jpg' },
+  { title: 'Andhadhun', kind: 'Movie', posterPath: 'posters/thriller/andhadhun.jpg' },
+  { title: 'Drishyam', kind: 'Movie', posterPath: 'posters/thriller/drishyam.jpg' },
+  { title: 'Badla', kind: 'Movie', posterPath: 'posters/thriller/badla.jpg' },
+  { title: 'Kahaani', kind: 'Movie', posterPath: 'posters/thriller/kahaani.jpg' },
+  { title: 'Raman Raghav 2.0', kind: 'Movie', posterPath: 'posters/thriller/raman-raghav-20.jpg' },
+  { title: 'Mindhunter', kind: 'Series', posterPath: 'posters/thriller/mindhunter.jpg' },
+  { title: '1000 Babies', kind: 'Series', posterPath: 'posters/thriller/1000-babies.jpg' },
+  { title: 'Breaking Bad', kind: 'Series', posterPath: 'posters/thriller/breaking-bad.jpg' },
+  { title: 'Sacred Games', kind: 'Series', posterPath: 'posters/thriller/sacred-games.jpg' },
+  { title: 'Asur', kind: 'Series', posterPath: 'posters/thriller/asur.jpg' },
+];
+
 const GENRE_RECOMMENDATIONS = [
   { genre: 'Action', items: ACTION_RECOMMENDATIONS },
   { genre: 'Romance', items: ROMANCE_RECOMMENDATIONS },
+  { genre: 'Thriller', items: THRILLER_RECOMMENDATIONS },
 ];
 
 function normalizeTitle(value) {

@@ -42,6 +42,21 @@ const POSTER_MAP = {
   'series|onedayseries': 'posters/romance/one-day-series.jpg',
   'series|littlethings': 'posters/romance/little-things.jpg',
   'series|brokenbutbeautiful': 'posters/romance/broken-but-beautiful.jpg',
+  'movie|se7en': 'posters/thriller/se7en.jpg',
+  'movie|gonegirl': 'posters/thriller/gone-girl.jpg',
+  'movie|shutterisland': 'posters/thriller/shutter-island.jpg',
+  'movie|thesilenceofthelambs': 'posters/thriller/silence-of-the-lambs.jpg',
+  'movie|prisoners': 'posters/thriller/prisoners.jpg',
+  'movie|andhadhun': 'posters/thriller/andhadhun.jpg',
+  'movie|drishyam': 'posters/thriller/drishyam.jpg',
+  'movie|badla': 'posters/thriller/badla.jpg',
+  'movie|kahaani': 'posters/thriller/kahaani.jpg',
+  'movie|ramanraghav20': 'posters/thriller/raman-raghav-20.jpg',
+  'series|mindhunter': 'posters/thriller/mindhunter.jpg',
+  'series|1000babies': 'posters/thriller/1000-babies.jpg',
+  'series|breakingbad': 'posters/thriller/breaking-bad.jpg',
+  'series|sacredgames': 'posters/thriller/sacred-games.jpg',
+  'series|asur': 'posters/thriller/asur.jpg',
 };
 
 async function getActiveSubscription(userId) {
