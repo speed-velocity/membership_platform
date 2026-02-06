@@ -101,7 +101,19 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
   `,
     [genre, req.user.id]
   );
-  const content = rows.map((r) => ({
+  const deduped = new Map();
+  for (const row of rows) {
+    const key = `${row.kind}|${(row.title || '').trim().toLowerCase()}`;
+    if (!deduped.has(key)) {
+      deduped.set(key, row);
+      continue;
+    }
+    const existing = deduped.get(key);
+    if (!existing.poster_path && row.poster_path) {
+      deduped.set(key, row);
+    }
+  }
+  const content = Array.from(deduped.values()).map((r) => ({
     id: r.id,
     title: r.title,
     kind: r.kind,
