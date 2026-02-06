@@ -8,6 +8,14 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const normalizeUser = (u) => {
+    if (!u) return u;
+    return {
+      ...u,
+      favoriteGenre: u.favoriteGenre ?? u.favorite_genre ?? null,
+    };
+  };
+
   const fetchJson = async (url, options) => {
     const res = await fetch(url, options);
     const contentType = res.headers.get('content-type') || '';
@@ -28,7 +36,7 @@ export function AuthProvider({ children }) {
     fetch(`${API}/auth/me`, { credentials: 'include' })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (data?.user) setUser(data.user);
+        if (data?.user) setUser(normalizeUser(data.user));
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -41,7 +49,7 @@ export function AuthProvider({ children }) {
       credentials: 'include',
       body: JSON.stringify({ email, password }),
     });
-    setUser(data.user);
+    setUser(normalizeUser(data.user));
     return data;
   };
 
@@ -52,7 +60,7 @@ export function AuthProvider({ children }) {
       credentials: 'include',
       body: JSON.stringify({ email, password, fullName }),
     });
-    setUser(data.user);
+    setUser(normalizeUser(data.user));
     return data;
   };
 
@@ -63,7 +71,7 @@ export function AuthProvider({ children }) {
       credentials: 'include',
       body: JSON.stringify({ email, password }),
     });
-    setUser(data.user);
+    setUser(normalizeUser(data.user));
     return data;
   };
 
@@ -72,8 +80,19 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const setUserFavoriteGenre = async (genre) => {
+    const data = await fetchJson(`${API}/users/favorite-genre`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ genre }),
+    });
+    setUser((prev) => (prev ? { ...prev, favoriteGenre: data.favoriteGenre } : prev));
+    return data;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, adminLogin, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, adminLogin, logout, setUserFavoriteGenre }}>
       {children}
     </AuthContext.Provider>
   );

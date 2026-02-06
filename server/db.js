@@ -55,7 +55,8 @@ async function initDb() {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       last_login TIMESTAMP,
       full_name TEXT,
-      telegram_username TEXT
+      telegram_username TEXT,
+      favorite_genre TEXT
     );
 
     CREATE TABLE IF NOT EXISTS subscriptions (
@@ -155,6 +156,8 @@ async function initDb() {
   if (!requestLimit) {
     await query("INSERT INTO settings (key, value) VALUES ('request_limit_per_12h', '2')");
   }
+
+  await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS favorite_genre TEXT');
 
   const adminEmail = config.adminEmail;
   const hasAdmin = await get('SELECT id FROM users WHERE email = $1', [adminEmail]);

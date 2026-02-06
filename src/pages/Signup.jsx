@@ -20,7 +20,7 @@ export default function Signup() {
     setLoading(true);
     try {
       await register(email, password, fullName);
-      navigate('/dashboard');
+      navigate('/onboarding/genre');
     } catch (err) {
       setError(err.message);
     } finally {

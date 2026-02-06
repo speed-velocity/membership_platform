@@ -25,7 +25,7 @@ function daysRemaining(expiryDate) {
 
 router.get('/dashboard', authMiddleware, async (req, res) => {
   const profile = await db.get(
-    'SELECT full_name, telegram_username FROM users WHERE id = $1',
+    'SELECT full_name, telegram_username, favorite_genre FROM users WHERE id = $1',
     [req.user.id]
   );
   const approved = await db.get(
@@ -46,6 +46,7 @@ router.get('/dashboard', authMiddleware, async (req, res) => {
       remainingDays: 0,
       fullName: profile?.full_name || null,
       telegramUsername: profile?.telegram_username || null,
+      favoriteGenre: profile?.favorite_genre || null,
       approvedRequests: Number(approved?.count || 0),
       deniedRequests: Number(denied?.count || 0),
     });
@@ -58,9 +59,29 @@ router.get('/dashboard', authMiddleware, async (req, res) => {
     remainingDays: daysRemaining(sub.expiry_date),
     fullName: profile?.full_name || null,
     telegramUsername: profile?.telegram_username || null,
+    favoriteGenre: profile?.favorite_genre || null,
     approvedRequests: Number(approved?.count || 0),
     deniedRequests: Number(denied?.count || 0),
   });
+});
+
+router.put('/favorite-genre', authMiddleware, async (req, res) => {
+  const { genre } = req.body || {};
+  const value = (genre || '').trim();
+  if (!value) return res.status(400).json({ error: 'Genre required' });
+  await db.run('UPDATE users SET favorite_genre = $1 WHERE id = $2', [value, req.user.id]);
+  res.json({ ok: true, favoriteGenre: value });
+});
+
+router.get('/recommendations', authMiddleware, async (req, res) => {
+  const profile = await db.get('SELECT favorite_genre FROM users WHERE id = $1', [req.user.id]);
+  const genre = profile?.favorite_genre;
+  if (!genre) return res.json({ genre: null, content: [] });
+  const rows = await db.all(
+    'SELECT id, title, category, thumbnail_path, created_at FROM content WHERE category = $1 ORDER BY created_at DESC LIMIT 8',
+    [genre]
+  );
+  res.json({ genre, content: rows });
 });
 
 router.get('/watchlist', authMiddleware, async (req, res) => {

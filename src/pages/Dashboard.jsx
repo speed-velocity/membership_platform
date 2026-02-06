@@ -7,11 +7,19 @@ const API = '/api';
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [recommendations, setRecommendations] = useState([]);
+  const [recGenre, setRecGenre] = useState('');
 
   useEffect(() => {
-    fetch(`${API}/users/dashboard`, { credentials: 'include' })
-      .then((r) => r.json())
-      .then(setData)
+    Promise.all([
+      fetch(`${API}/users/dashboard`, { credentials: 'include' }).then((r) => r.json()),
+      fetch(`${API}/users/recommendations`, { credentials: 'include' }).then((r) => r.json()),
+    ])
+      .then(([dash, rec]) => {
+        setData(dash);
+        setRecommendations(rec?.content || []);
+        setRecGenre(rec?.genre || '');
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -89,6 +97,30 @@ export default function Dashboard() {
             <span className="action-icon">âœ‰</span>
             <span>Movie Requests</span>
           </Link>
+        </div>
+
+        <div className="glass-card dashboard-card">
+          <h2>Weekly Picks {recGenre ? `· ${recGenre}` : ''}</h2>
+          {recommendations.length > 0 ? (
+            <div className="weekly-grid">
+              {recommendations.map((item) => (
+                <Link key={item.id} to={`/content/${item.id}`} className="weekly-card">
+                  {item.thumbnail_path ? (
+                    <img src={`/${item.thumbnail_path}`} alt={item.title} />
+                  ) : (
+                    <div className="weekly-placeholder">Movie</div>
+                  )}
+                  <span>{item.title}</span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="no-sub-desc">
+              {recGenre
+                ? 'No new picks yet. We will update this weekly.'
+                : 'Choose a favorite genre to unlock weekly recommendations.'}
+            </p>
+          )}
         </div>
       </div>
     </div>

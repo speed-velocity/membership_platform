@@ -14,7 +14,16 @@ export default function Login() {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    if (user) navigate(user.role === 'admin' ? '/admin' : '/dashboard');
+    if (!user) return;
+    if (user.role === 'admin') {
+      navigate('/admin');
+      return;
+    }
+    if (!user.favoriteGenre) {
+      navigate('/onboarding/genre');
+      return;
+    }
+    navigate('/dashboard');
   }, [user, navigate]);
 
   const handleSubmit = async (e) => {
@@ -26,6 +35,10 @@ export default function Login() {
       if (data?.user?.role === 'admin') {
         setError('Use the admin login at /admin/login');
         setLoading(false);
+        return;
+      }
+      if (!data?.user?.favoriteGenre) {
+        navigate('/onboarding/genre');
         return;
       }
       navigate('/dashboard');

@@ -25,11 +25,11 @@ router.post('/register', async (req, res) => {
       'INSERT INTO users (email, password, role, full_name) VALUES ($1, $2, $3, $4)',
       [email, hashed, 'user', fullName]
     );
-    const user = await db.get('SELECT id, email, role, full_name FROM users WHERE email = $1', [email]);
+    const user = await db.get('SELECT id, email, role, full_name, favorite_genre FROM users WHERE email = $1', [email]);
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
     res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: 'lax' });
     sendEmail(config.notificationEmail, 'New Member Signup', `New user registered: ${email}`);
-    res.json({ user: { id: user.id, email: user.email, role: user.role }, token });
+    res.json({ user: { id: user.id, email: user.email, role: user.role, favoriteGenre: user.favorite_genre || null }, token });
   } catch (e) {
     if (e.code === '23505') {
       return res.status(400).json({ error: 'Email already registered' });
@@ -44,7 +44,7 @@ router.post('/login', async (req, res) => {
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password required' });
   }
-  const user = await db.get('SELECT id, email, password, role, full_name FROM users WHERE email = $1', [email]);
+  const user = await db.get('SELECT id, email, password, role, full_name, favorite_genre FROM users WHERE email = $1', [email]);
   const pwd = user?.password ?? user?.Password;
   if (!user || !pwd || !bcrypt.compareSync(password, pwd)) {
     return res.status(401).json({ error: 'Invalid credentials' });
@@ -52,7 +52,7 @@ router.post('/login', async (req, res) => {
   await recordLogin(req, user);
   const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
   res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: 'lax' });
-  res.json({ user: { id: user.id, email: user.email, role: user.role }, token });
+  res.json({ user: { id: user.id, email: user.email, role: user.role, favoriteGenre: user.favorite_genre || null }, token });
 });
 
 router.post('/admin-login', async (req, res) => {
@@ -61,7 +61,7 @@ router.post('/admin-login', async (req, res) => {
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password required' });
   }
-  const user = await db.get('SELECT id, email, password, role, full_name FROM users WHERE email = $1', [email]);
+  const user = await db.get('SELECT id, email, password, role, full_name, favorite_genre FROM users WHERE email = $1', [email]);
   const pwd = user?.password ?? user?.Password;
   if (!user || !pwd || !bcrypt.compareSync(password, pwd)) {
     return res.status(401).json({ error: 'Invalid credentials' });
@@ -73,7 +73,7 @@ router.post('/admin-login', async (req, res) => {
   await recordLogin(req, user);
   const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
   res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000, sameSite: 'lax' });
-  res.json({ user: { id: user.id, email: user.email, role: user.role }, token });
+  res.json({ user: { id: user.id, email: user.email, role: user.role, favoriteGenre: user.favorite_genre || null }, token });
 });
 
 router.post('/logout', (req, res) => {
@@ -201,7 +201,13 @@ router.post('/reset-password', async (req, res) => {
 });
 
 router.get('/me', authMiddleware, (req, res) => {
-  res.json({ user: req.user });
+  const user = req.user;
+  res.json({
+    user: {
+      ...user,
+      favoriteGenre: user.favorite_genre || null,
+    },
+  });
 });
 
 module.exports = router;
