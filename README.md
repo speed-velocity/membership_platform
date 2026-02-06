@@ -6,8 +6,8 @@ A full-stack subscription-based membership platform with cinematic dark mode UI.
 
 ```bash
 npm install
-cp .env.example .env    # Edit .env with your admin email, password, and SMTP settings
-npm run init-db        # Creates admin from .env
+cp .env.example .env    # Edit .env with your admin email, password, SMTP, and DATABASE_URL
+npm run init-db        # Creates tables + admin from .env
 npm run dev            # Starts backend + frontend
 ```
 
@@ -18,6 +18,8 @@ npm run dev            # Starts backend + frontend
 
 | Variable | Description |
 |----------|-------------|
+| `DATABASE_URL` | Postgres connection string |
+| `DATABASE_SSL` | Set `true` if your Postgres provider requires SSL |
 | `ADMIN_EMAIL` | Your admin login email |
 | `ADMIN_PASSWORD` | Your admin password |
 | `SMTP_HOST` | SMTP server (e.g. smtp.gmail.com) |

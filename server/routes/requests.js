@@ -6,36 +6,38 @@ const config = require('../config');
 
 const router = express.Router();
 
-function getRequestLimit() {
-  const row = db.prepare('SELECT value FROM settings WHERE key = ?').get('request_limit_per_12h');
+async function getRequestLimit() {
+  const row = await db.get('SELECT value FROM settings WHERE key = $1', ['request_limit_per_12h']);
   return parseInt(row?.value || '2', 10);
 }
 
-function getRecentRequestCount(userId) {
-  const limit = getRequestLimit();
+async function getRecentRequestCount(userId) {
   const cutoff = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
-  const count = db.prepare(
-    'SELECT COUNT(*) as c FROM movie_requests WHERE user_id = ? AND created_at >= ?'
-  ).get(userId, cutoff);
-  return count?.c || 0;
+  const count = await db.get(
+    'SELECT COUNT(*) as c FROM movie_requests WHERE user_id = $1 AND created_at >= $2',
+    [userId, cutoff]
+  );
+  return Number(count?.c || 0);
 }
 
-function getNextRequestTime(userId) {
-  const limit = getRequestLimit();
+async function getNextRequestTime(userId) {
+  const limit = await getRequestLimit();
   const cutoff = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
-  const oldest = db.prepare(
-    'SELECT created_at FROM movie_requests WHERE user_id = ? AND created_at >= ? ORDER BY created_at ASC LIMIT 1'
-  ).get(userId, cutoff);
-  if (!oldest || getRecentRequestCount(userId) < limit) return null;
+  const oldest = await db.get(
+    'SELECT created_at FROM movie_requests WHERE user_id = $1 AND created_at >= $2 ORDER BY created_at ASC LIMIT 1',
+    [userId, cutoff]
+  );
+  const recent = await getRecentRequestCount(userId);
+  if (!oldest || recent < limit) return null;
   const t = new Date(oldest.created_at);
   t.setHours(t.getHours() + 12);
   return t.toISOString();
 }
 
-router.get('/limit-status', authMiddleware, (req, res) => {
-  const count = getRecentRequestCount(req.user.id);
-  const limit = getRequestLimit();
-  const nextAvailable = getNextRequestTime(req.user.id);
+router.get('/limit-status', authMiddleware, async (req, res) => {
+  const count = await getRecentRequestCount(req.user.id);
+  const limit = await getRequestLimit();
+  const nextAvailable = await getNextRequestTime(req.user.id);
   res.json({
     count,
     limit,
@@ -44,15 +46,15 @@ router.get('/limit-status', authMiddleware, (req, res) => {
   });
 });
 
-router.post('/', authMiddleware, (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   const { title, message } = req.body;
   if (!title || !title.trim()) {
     return res.status(400).json({ error: 'Title is required' });
   }
-  const count = getRecentRequestCount(req.user.id);
-  const limit = getRequestLimit();
+  const count = await getRecentRequestCount(req.user.id);
+  const limit = await getRequestLimit();
   if (count >= limit) {
-    const nextAvailable = getNextRequestTime(req.user.id);
+    const nextAvailable = await getNextRequestTime(req.user.id);
     return res.status(429).json({
       error: 'Request limit reached',
       nextAvailableAt: nextAvailable,
@@ -60,18 +62,17 @@ router.post('/', authMiddleware, (req, res) => {
       limit,
     });
   }
-  db.prepare('INSERT INTO movie_requests (user_id, title, message) VALUES (?, ?, ?)').run(
-    req.user.id,
-    title.trim(),
-    (message || '').trim()
+  await db.run(
+    'INSERT INTO movie_requests (user_id, title, message) VALUES ($1, $2, $3)',
+    [req.user.id, title.trim(), (message || '').trim()]
   );
   sendEmail(
     config.notificationEmail,
     'New Movie Request',
     `User ${req.user.email} requested: ${title.trim()}${message ? '\nMessage: ' + message : ''}`
   );
-  const newCount = getRecentRequestCount(req.user.id);
-  const nextAvailable = getNextRequestTime(req.user.id);
+  const newCount = await getRecentRequestCount(req.user.id);
+  const nextAvailable = await getNextRequestTime(req.user.id);
   res.json({
     ok: true,
     count: newCount,
@@ -80,10 +81,11 @@ router.post('/', authMiddleware, (req, res) => {
   });
 });
 
-router.get('/my', authMiddleware, (req, res) => {
-  const rows = db.prepare(
-    'SELECT id, title, message, status, created_at FROM movie_requests WHERE user_id = ? ORDER BY created_at DESC'
-  ).all(req.user.id);
+router.get('/my', authMiddleware, async (req, res) => {
+  const rows = await db.all(
+    'SELECT id, title, message, status, created_at FROM movie_requests WHERE user_id = $1 ORDER BY created_at DESC',
+    [req.user.id]
+  );
   res.json({ requests: rows });
 });
 

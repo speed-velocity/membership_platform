@@ -3,37 +3,27 @@
  * Uses ADMIN_EMAIL and ADMIN_PASSWORD from .env
  * IMPORTANT: Stop the server first, then run this, then restart the server.
  */
-const path = require('path');
-const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const config = require('./config');
-
-const dbPath = path.join(__dirname, '..', 'data', 'membership.db');
+const db = require('./db');
 
 async function resetAdmin() {
-  const initSqlJs = require('sql.js');
-
-  if (!fs.existsSync(dbPath)) {
-    console.error('Database not found. Run: npm run init-db');
-    process.exit(1);
-  }
-
-  const SQL = await initSqlJs();
-  const buf = fs.readFileSync(dbPath);
-  const db = new SQL.Database(buf);
+  await db.initDb();
 
   const adminEmail = config.adminEmail;
   const hashedPassword = bcrypt.hashSync(config.adminPassword, 10);
 
-  const stmt = db.prepare('UPDATE users SET password = ? WHERE email = ? AND role = ?');
-  stmt.run([hashedPassword, adminEmail, 'admin']);
-  const changes = db.getRowsModified();
-  stmt.free();
+  const updated = await db.run(
+    'UPDATE users SET password = $1 WHERE email = $2 AND role = $3',
+    [hashedPassword, adminEmail, 'admin']
+  );
 
-  if (changes === 0) {
-    const insertStmt = db.prepare('INSERT INTO users (email, password, role) VALUES (?, ?, ?)');
-    insertStmt.run([adminEmail, hashedPassword, 'admin']);
-    insertStmt.free();
+  if (updated.changes === 0) {
+    await db.run('INSERT INTO users (email, password, role) VALUES ($1, $2, $3)', [
+      adminEmail,
+      hashedPassword,
+      'admin',
+    ]);
     console.log(`Admin user created: ${adminEmail}`);
   } else {
     console.log('Admin password reset successfully!');
@@ -42,10 +32,6 @@ async function resetAdmin() {
   console.log(`Email: ${adminEmail}`);
   console.log('Password: (from .env ADMIN_PASSWORD)');
   console.log('\nRestart the server (npm run dev) for changes to take effect.');
-
-  const data = db.export();
-  fs.writeFileSync(dbPath, Buffer.from(data));
-  db.close();
 }
 
 resetAdmin().catch((e) => {

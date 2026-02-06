@@ -3,14 +3,14 @@ const db = require('../db');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'cinematic-platform-secret-key-change-in-production';
 
-function authMiddleware(req, res, next) {
+async function authMiddleware(req, res, next) {
   const token = req.cookies?.token || req.headers.authorization?.replace('Bearer ', '');
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    const user = db.prepare('SELECT id, email, role FROM users WHERE id = ?').get(decoded.userId);
+    const user = await db.get('SELECT id, email, role FROM users WHERE id = $1', [decoded.userId]);
     if (!user) return res.status(401).json({ error: 'User not found' });
     req.user = user;
     next();

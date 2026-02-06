@@ -43,7 +43,7 @@ app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 async function start() {
   await db.initDb();
-  cronJobs.start();
+  await cronJobs.start();
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });

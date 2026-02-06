@@ -18,19 +18,19 @@ const upload = multer({ storage });
 router.use(authMiddleware);
 router.use(adminOnly);
 
-router.get('/subscriptions', (req, res) => {
-  const rows = db.prepare(`
+router.get('/subscriptions', async (req, res) => {
+  const rows = await db.all(`
     SELECT s.id, s.plan, s.start_date, s.expiry_date, u.email
     FROM subscriptions s
     JOIN users u ON u.id = s.user_id
-    WHERE s.is_active = 1 AND s.expiry_date >= date('now')
+    WHERE s.is_active = 1 AND s.expiry_date >= CURRENT_DATE
     ORDER BY s.expiry_date ASC
-  `).all();
+  `);
   res.json({ subscriptions: rows });
 });
 
-router.get('/users', (req, res) => {
-  const users = db.prepare(`
+router.get('/users', async (req, res) => {
+  const users = await db.all(`
     SELECT
       id,
       email,
@@ -39,22 +39,24 @@ router.get('/users', (req, res) => {
       last_login,
       (SELECT COUNT(*) FROM movie_requests mr WHERE mr.user_id = users.id) AS request_count
     FROM users
-    WHERE role = ?
+    WHERE role = $1
     ORDER BY created_at DESC
-  `).all('user');
-  const withSubs = users.map((u) => {
-    const sub = db.prepare(
-      'SELECT plan, start_date, expiry_date, is_active FROM subscriptions WHERE user_id = ? AND is_active = 1 ORDER BY expiry_date DESC LIMIT 1'
-    ).get(u.id);
+  `, ['user']);
+  const withSubs = await Promise.all(users.map(async (u) => {
+    const sub = await db.get(
+      'SELECT plan, start_date, expiry_date, is_active FROM subscriptions WHERE user_id = $1 AND is_active = 1 ORDER BY expiry_date DESC LIMIT 1',
+      [u.id]
+    );
     return {
       ...u,
+      request_count: Number(u.request_count || 0),
       subscription: sub || null,
     };
-  });
+  }));
   res.json({ users: withSubs });
 });
 
-router.post('/subscriptions', (req, res) => {
+router.post('/subscriptions', async (req, res) => {
   const { userId, plan, months } = req.body;
   if (!userId || !plan || !months) {
     return res.status(400).json({ error: 'userId, plan, and months required' });
@@ -64,11 +66,12 @@ router.post('/subscriptions', (req, res) => {
   expiry.setMonth(expiry.getMonth() + parseInt(months, 10));
   const startStr = start.toISOString().split('T')[0];
   const expiryStr = expiry.toISOString().split('T')[0];
-  db.prepare('UPDATE subscriptions SET is_active = 0 WHERE user_id = ?').run(userId);
-  db.prepare(
-    'INSERT INTO subscriptions (user_id, plan, start_date, expiry_date, is_active) VALUES (?, ?, ?, ?, 1)'
-  ).run(userId, plan, startStr, expiryStr);
-  const user = db.prepare('SELECT email FROM users WHERE id = ?').get(userId);
+  await db.run('UPDATE subscriptions SET is_active = 0 WHERE user_id = $1', [userId]);
+  await db.run(
+    'INSERT INTO subscriptions (user_id, plan, start_date, expiry_date, is_active) VALUES ($1, $2, $3, $4, 1)',
+    [userId, plan, startStr, expiryStr]
+  );
+  const user = await db.get('SELECT email FROM users WHERE id = $1', [userId]);
   const userEmail = user?.email ?? user?.Email;
   if (userEmail) {
     sendEmail(userEmail, 'Subscription Activated', `Your ${plan} subscription is now active.\nStart: ${startStr}\nExpires: ${expiryStr}`);
@@ -76,51 +79,49 @@ router.post('/subscriptions', (req, res) => {
   res.json({ ok: true, startDate: startStr, expiryDate: expiryStr });
 });
 
-router.put('/subscriptions/:userId', (req, res) => {
+router.put('/subscriptions/:userId', async (req, res) => {
   const { userId } = req.params;
   const { expiryDate, isActive } = req.body;
   if (!expiryDate) return res.status(400).json({ error: 'expiryDate required' });
-  db.prepare('UPDATE subscriptions SET expiry_date = ?, is_active = ? WHERE user_id = ? AND is_active = 1').run(
-    expiryDate,
-    isActive !== false ? 1 : 0,
-    userId
+  await db.run(
+    'UPDATE subscriptions SET expiry_date = $1, is_active = $2 WHERE user_id = $3 AND is_active = 1',
+    [expiryDate, isActive !== false ? 1 : 0, userId]
   );
   res.json({ ok: true });
 });
 
-router.get('/content', (req, res) => {
-  const items = db.prepare('SELECT * FROM content ORDER BY created_at DESC').all();
+router.get('/content', async (req, res) => {
+  const items = await db.all('SELECT * FROM content ORDER BY created_at DESC');
   res.json({ content: items });
 });
 
-router.post('/content', (req, res) => {
+router.post('/content', async (req, res) => {
   const { title, description, category } = req.body;
   if (!title || !category) return res.status(400).json({ error: 'Title and category required' });
-  db.prepare('INSERT INTO content (title, description, category) VALUES (?, ?, ?)').run(
-    title || '',
-    description || '',
-    category
+  const inserted = await db.get(
+    'INSERT INTO content (title, description, category) VALUES ($1, $2, $3) RETURNING id',
+    [title || '', description || '', category]
   );
-  const id = db.prepare('SELECT last_insert_rowid() as id').get().id;
+  const id = inserted?.id;
   res.json({ id });
 });
 
-router.put('/content/:id', (req, res) => {
+router.put('/content/:id', async (req, res) => {
   const { id } = req.params;
   const { title, description, category, thumbnail_path, video_1080_path, video_4k_path } = req.body;
-  const item = db.prepare('SELECT id FROM content WHERE id = ?').get(id);
+  const item = await db.get('SELECT id FROM content WHERE id = $1', [id]);
   if (!item) return res.status(404).json({ error: 'Content not found' });
   const updates = [];
   const params = [];
-  if (title !== undefined) { updates.push('title = ?'); params.push(title); }
-  if (description !== undefined) { updates.push('description = ?'); params.push(description); }
-  if (category !== undefined) { updates.push('category = ?'); params.push(category); }
-  if (thumbnail_path !== undefined) { updates.push('thumbnail_path = ?'); params.push(thumbnail_path); }
-  if (video_1080_path !== undefined) { updates.push('video_1080_path = ?'); params.push(video_1080_path); }
-  if (video_4k_path !== undefined) { updates.push('video_4k_path = ?'); params.push(video_4k_path); }
+  if (title !== undefined) { params.push(title); updates.push(`title = $${params.length}`); }
+  if (description !== undefined) { params.push(description); updates.push(`description = $${params.length}`); }
+  if (category !== undefined) { params.push(category); updates.push(`category = $${params.length}`); }
+  if (thumbnail_path !== undefined) { params.push(thumbnail_path); updates.push(`thumbnail_path = $${params.length}`); }
+  if (video_1080_path !== undefined) { params.push(video_1080_path); updates.push(`video_1080_path = $${params.length}`); }
+  if (video_4k_path !== undefined) { params.push(video_4k_path); updates.push(`video_4k_path = $${params.length}`); }
   if (updates.length === 0) return res.json({ ok: true });
   params.push(id);
-  db.prepare(`UPDATE content SET ${updates.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`).run(...params);
+  await db.run(`UPDATE content SET ${updates.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${params.length}`, params);
   res.json({ ok: true });
 });
 
@@ -128,80 +129,80 @@ router.post('/content/:id/upload', upload.fields([
   { name: 'thumbnail', maxCount: 1 },
   { name: 'video1080', maxCount: 1 },
   { name: 'video4k', maxCount: 1 },
-]), (req, res) => {
+]), async (req, res) => {
   const { id } = req.params;
-  const item = db.prepare('SELECT id FROM content WHERE id = ?').get(id);
+  const item = await db.get('SELECT id FROM content WHERE id = $1', [id]);
   if (!item) return res.status(404).json({ error: 'Content not found' });
   const updates = [];
   const params = [];
   if (req.files?.thumbnail?.[0]) {
-    updates.push('thumbnail_path = ?');
     params.push('uploads/content/' + req.files.thumbnail[0].filename);
+    updates.push(`thumbnail_path = $${params.length}`);
   }
   if (req.files?.video1080?.[0]) {
-    updates.push('video_1080_path = ?');
     params.push('uploads/content/' + req.files.video1080[0].filename);
+    updates.push(`video_1080_path = $${params.length}`);
   }
   if (req.files?.video4k?.[0]) {
-    updates.push('video_4k_path = ?');
     params.push('uploads/content/' + req.files.video4k[0].filename);
+    updates.push(`video_4k_path = $${params.length}`);
   }
   if (updates.length === 0) return res.json({ ok: true });
   params.push(id);
-  db.prepare(`UPDATE content SET ${updates.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`).run(...params);
+  await db.run(`UPDATE content SET ${updates.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${params.length}`, params);
   res.json({ ok: true });
 });
 
-router.delete('/content/:id', (req, res) => {
-  db.prepare('DELETE FROM content WHERE id = ?').run(req.params.id);
+router.delete('/content/:id', async (req, res) => {
+  await db.run('DELETE FROM content WHERE id = $1', [req.params.id]);
   res.json({ ok: true });
 });
 
-router.get('/requests', (req, res) => {
-  const rows = db.prepare(`
+router.get('/requests', async (req, res) => {
+  const rows = await db.all(`
     SELECT mr.id, mr.user_id, mr.title, mr.message, mr.status, mr.created_at, u.email
     FROM movie_requests mr
     JOIN users u ON u.id = mr.user_id
     ORDER BY mr.created_at DESC
-  `).all();
+  `);
   res.json({ requests: rows });
 });
 
-router.get('/logins', (req, res) => {
-  const rows = db.prepare(`
+router.get('/logins', async (req, res) => {
+  const rows = await db.all(`
     SELECT lh.id, lh.user_id, lh.email, lh.full_name, lh.role, lh.ip, lh.user_agent, lh.created_at
     FROM login_history lh
     ORDER BY lh.created_at DESC
     LIMIT 200
-  `).all();
+  `);
   res.json({ logins: rows });
 });
 
-router.get('/analytics', (req, res) => {
-  const totalUsers = db.prepare("SELECT COUNT(*) as count FROM users WHERE role = 'user'").get().count;
-  const activeSubs = db.prepare(
-    "SELECT COUNT(*) as count FROM subscriptions WHERE is_active = 1 AND expiry_date >= date('now')"
-  ).get().count;
-  const totalRequests = db.prepare('SELECT COUNT(*) as count FROM movie_requests').get().count;
-  const pendingRequests = db.prepare("SELECT COUNT(*) as count FROM movie_requests WHERE status = 'pending'").get().count;
-  const approvedRequests = db.prepare("SELECT COUNT(*) as count FROM movie_requests WHERE status = 'approved'").get().count;
-  const deniedRequests = db.prepare("SELECT COUNT(*) as count FROM movie_requests WHERE status = 'denied'").get().count;
-  const logins7d = db.prepare(
-    "SELECT COUNT(*) as count FROM login_history WHERE created_at >= datetime('now', '-7 day')"
-  ).get().count;
+router.get('/analytics', async (req, res) => {
+  const totalUsers = await db.get("SELECT COUNT(*) as count FROM users WHERE role = 'user'");
+  const activeSubs = await db.get(
+    "SELECT COUNT(*) as count FROM subscriptions WHERE is_active = 1 AND expiry_date >= CURRENT_DATE"
+  );
+  const totalRequests = await db.get('SELECT COUNT(*) as count FROM movie_requests');
+  const pendingRequests = await db.get("SELECT COUNT(*) as count FROM movie_requests WHERE status = 'pending'");
+  const approvedRequests = await db.get("SELECT COUNT(*) as count FROM movie_requests WHERE status = 'approved'");
+  const deniedRequests = await db.get("SELECT COUNT(*) as count FROM movie_requests WHERE status = 'denied'");
+  const logins7d = await db.get(
+    "SELECT COUNT(*) as count FROM login_history WHERE created_at >= NOW() - INTERVAL '7 days'"
+  );
   res.json({
-    totalUsers,
-    activeSubs,
-    totalRequests,
-    pendingRequests,
-    approvedRequests,
-    deniedRequests,
-    logins7d,
+    totalUsers: Number(totalUsers?.count || 0),
+    activeSubs: Number(activeSubs?.count || 0),
+    totalRequests: Number(totalRequests?.count || 0),
+    pendingRequests: Number(pendingRequests?.count || 0),
+    approvedRequests: Number(approvedRequests?.count || 0),
+    deniedRequests: Number(deniedRequests?.count || 0),
+    logins7d: Number(logins7d?.count || 0),
   });
 });
 
-router.get('/activity', (req, res) => {
-  const rows = db.prepare(`
+router.get('/activity', async (req, res) => {
+  const rows = await db.all(`
     SELECT 'login' as type, lh.email as email, lh.created_at as created_at,
            lh.ip as meta, lh.user_agent as detail
     FROM login_history lh
@@ -212,31 +213,34 @@ router.get('/activity', (req, res) => {
     JOIN users u ON u.id = mr.user_id
     ORDER BY created_at DESC
     LIMIT 200
-  `).all();
+  `);
   res.json({ activity: rows });
 });
 
-router.put('/requests/:id', (req, res) => {
+router.put('/requests/:id', async (req, res) => {
   const { status } = req.body;
   if (!status) return res.status(400).json({ error: 'status required' });
-  db.prepare('UPDATE movie_requests SET status = ? WHERE id = ?').run(status, req.params.id);
+  await db.run('UPDATE movie_requests SET status = $1 WHERE id = $2', [status, req.params.id]);
   res.json({ ok: true });
 });
 
-router.get('/settings', (req, res) => {
-  const rows = db.prepare('SELECT key, value FROM settings').all();
+router.get('/settings', async (req, res) => {
+  const rows = await db.all('SELECT key, value FROM settings');
   const settings = {};
   rows.forEach((r) => { settings[r.key] = r.value; });
   res.json({ settings });
 });
 
-router.put('/settings/request-limit', (req, res) => {
+router.put('/settings/request-limit', async (req, res) => {
   const { value } = req.body;
   const num = parseInt(value, 10);
   if (isNaN(num) || num < 1 || num > 10) {
     return res.status(400).json({ error: 'Request limit must be between 1 and 10' });
   }
-  db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run('request_limit_per_12h', String(num));
+  await db.run(
+    'INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value',
+    ['request_limit_per_12h', String(num)]
+  );
   res.json({ ok: true, value: num });
 });
 

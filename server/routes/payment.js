@@ -14,7 +14,7 @@ router.get('/plans', (req, res) => {
   res.json({ plans: PLANS });
 });
 
-router.post('/subscribe', authMiddleware, (req, res) => {
+router.post('/subscribe', authMiddleware, async (req, res) => {
   if (req.user.role !== 'user') {
     return res.status(403).json({ error: 'Members only' });
   }
@@ -37,15 +37,15 @@ router.post('/subscribe', authMiddleware, (req, res) => {
   expiryDate.setMonth(expiryDate.getMonth() + monthsNum);
   const startStr = start.toISOString().split('T')[0];
   const expiryStr = expiryDate.toISOString().split('T')[0];
-  db.prepare('UPDATE users SET full_name = ?, telegram_username = ? WHERE id = ?').run(
-    fullName,
-    telegramUsername,
-    req.user.id
+  await db.run(
+    'UPDATE users SET full_name = $1, telegram_username = $2 WHERE id = $3',
+    [fullName, telegramUsername, req.user.id]
   );
-  db.prepare('UPDATE subscriptions SET is_active = 0 WHERE user_id = ?').run(req.user.id);
-  db.prepare(
-    'INSERT INTO subscriptions (user_id, plan, start_date, expiry_date, is_active) VALUES (?, ?, ?, ?, 1)'
-  ).run(req.user.id, plan, startStr, expiryStr);
+  await db.run('UPDATE subscriptions SET is_active = 0 WHERE user_id = $1', [req.user.id]);
+  await db.run(
+    'INSERT INTO subscriptions (user_id, plan, start_date, expiry_date, is_active) VALUES ($1, $2, $3, $4, 1)',
+    [req.user.id, plan, startStr, expiryStr]
+  );
   const userEmail = req.user.email ?? req.user.Email;
   sendEmail(
     userEmail,

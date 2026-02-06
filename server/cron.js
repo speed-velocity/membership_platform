@@ -3,16 +3,16 @@ const db = require('./db');
 const { sendEmail } = require('./emailService');
 const config = require('./config');
 
-function checkExpiringSubscriptions() {
+async function checkExpiringSubscriptions() {
   const in3Days = new Date();
   in3Days.setDate(in3Days.getDate() + 3);
   const dateStr = in3Days.toISOString().split('T')[0];
-  const rows = db.prepare(`
+  const rows = await db.all(`
     SELECT s.user_id, s.expiry_date, s.plan, u.email
     FROM subscriptions s
     JOIN users u ON u.id = s.user_id
-    WHERE s.is_active = 1 AND s.expiry_date = ? AND s.expiry_date >= date('now')
-  `).all(dateStr);
+    WHERE s.is_active = 1 AND s.expiry_date = $1 AND s.expiry_date >= CURRENT_DATE
+  `, [dateStr]);
   rows.forEach((r) => {
     const email = r.email ?? r.Email;
     sendEmail(
@@ -23,13 +23,13 @@ function checkExpiringSubscriptions() {
   });
 }
 
-function deactivateExpiredSubscriptions() {
-  const expired = db.prepare(`
+async function deactivateExpiredSubscriptions() {
+  const expired = await db.all(`
     SELECT u.email, s.plan, s.expiry_date
     FROM subscriptions s
     JOIN users u ON u.id = s.user_id
-    WHERE s.expiry_date < date('now') AND s.is_active = 1
-  `).all();
+    WHERE s.expiry_date < CURRENT_DATE AND s.is_active = 1
+  `);
   expired.forEach((r) => {
     const email = r.email ?? r.Email;
     sendEmail(
@@ -38,14 +38,14 @@ function deactivateExpiredSubscriptions() {
       `Your ${r.plan} subscription has expired on ${r.expiry_date}. Renew at the platform to restore access.`
     );
   });
-  db.prepare('UPDATE subscriptions SET is_active = 0 WHERE expiry_date < date("now") AND is_active = 1').run();
+  await db.run('UPDATE subscriptions SET is_active = 0 WHERE expiry_date < CURRENT_DATE AND is_active = 1');
 }
 
-function start() {
-  deactivateExpiredSubscriptions();
-  cron.schedule('0 * * * *', () => {
-    deactivateExpiredSubscriptions();
-    checkExpiringSubscriptions();
+async function start() {
+  await deactivateExpiredSubscriptions();
+  cron.schedule('0 * * * *', async () => {
+    await deactivateExpiredSubscriptions();
+    await checkExpiringSubscriptions();
   });
 }
 

@@ -13,30 +13,33 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-function getActiveSubscription(userId) {
-  return db.prepare(`
+async function getActiveSubscription(userId) {
+  return db.get(
+    `
     SELECT id FROM subscriptions 
-    WHERE user_id = ? AND is_active = 1 AND expiry_date >= date('now')
+    WHERE user_id = $1 AND is_active = 1 AND expiry_date >= CURRENT_DATE
     LIMIT 1
-  `).get(userId);
+  `,
+    [userId]
+  );
 }
 
-router.get('/', authMiddleware, (req, res) => {
-  const hasSub = getActiveSubscription(req.user.id);
+router.get('/', authMiddleware, async (req, res) => {
+  const hasSub = await getActiveSubscription(req.user.id);
   const category = req.query.category;
   let sql = `
     SELECT c.*, w.id as watch_id
     FROM content c
-    LEFT JOIN watchlist w ON w.content_id = c.id AND w.user_id = ?
+    LEFT JOIN watchlist w ON w.content_id = c.id AND w.user_id = $1
     WHERE 1=1
   `;
   const params = [req.user.id];
   if (category) {
-    sql += ' AND c.category = ?';
+    sql += ' AND c.category = $2';
     params.push(category);
   }
   sql += ' ORDER BY c.created_at DESC';
-  const items = db.prepare(sql).all(...params);
+  const items = await db.all(sql, params);
   const withAccess = items.map((item) => ({
     id: item.id,
     title: item.title,
@@ -52,18 +55,18 @@ router.get('/', authMiddleware, (req, res) => {
   res.json({ content: withAccess });
 });
 
-router.get('/categories', (req, res) => {
-  const rows = db.prepare('SELECT DISTINCT category FROM content ORDER BY category').all();
+router.get('/categories', async (req, res) => {
+  const rows = await db.all('SELECT DISTINCT category FROM content ORDER BY category');
   res.json({ categories: rows.map((r) => r.category) });
 });
 
-router.get('/:id/stream', authMiddleware, (req, res) => {
-  const hasSub = getActiveSubscription(req.user.id);
+router.get('/:id/stream', authMiddleware, async (req, res) => {
+  const hasSub = await getActiveSubscription(req.user.id);
   if (!hasSub) {
     return res.status(403).json({ error: 'Active subscription required' });
   }
   const quality = req.query.quality || '1080p';
-  const item = db.prepare('SELECT * FROM content WHERE id = ?').get(req.params.id);
+  const item = await db.get('SELECT * FROM content WHERE id = $1', [req.params.id]);
   if (!item) return res.status(404).json({ error: 'Content not found' });
   const videoPath = quality === '4k' ? item.video_4k_path : item.video_1080_path;
   if (!videoPath) return res.status(404).json({ error: 'Quality not available' });
@@ -73,9 +76,9 @@ router.get('/:id/stream', authMiddleware, (req, res) => {
   });
 });
 
-router.get('/:id', authMiddleware, (req, res) => {
-  const hasSub = getActiveSubscription(req.user.id);
-  const item = db.prepare('SELECT * FROM content WHERE id = ?').get(req.params.id);
+router.get('/:id', authMiddleware, async (req, res) => {
+  const hasSub = await getActiveSubscription(req.user.id);
+  const item = await db.get('SELECT * FROM content WHERE id = $1', [req.params.id]);
   if (!item) return res.status(404).json({ error: 'Content not found' });
   const response = {
     ...item,
