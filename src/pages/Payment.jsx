@@ -14,6 +14,8 @@ const DURATIONS = [1, 3, 6, 12];
 export default function Payment() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [dashboard, setDashboard] = useState(null);
+  const [dashLoading, setDashLoading] = useState(true);
   const [plan, setPlan] = useState('Basic');
   const [months, setMonths] = useState(1);
   const [qrTapped, setQrTapped] = useState(false);
@@ -27,6 +29,14 @@ export default function Payment() {
     if (!authLoading && !user) navigate('/login');
     if (user?.role === 'admin') navigate('/dashboard');
   }, [user, authLoading, navigate]);
+
+  useEffect(() => {
+    if (!user || user.role !== 'user') return;
+    fetch(`${API}/users/dashboard`, { credentials: 'include' })
+      .then((r) => r.json())
+      .then(setDashboard)
+      .finally(() => setDashLoading(false));
+  }, [user]);
 
   const selectedPlan = PLANS.find((p) => p.id === plan);
   const total = selectedPlan ? (selectedPlan.price * months).toFixed(2) : '0';
@@ -60,6 +70,35 @@ export default function Payment() {
   };
 
   if (authLoading) return <div className="loading-screen"><div className="loader" /></div>;
+
+  if (dashLoading) return <div className="loading-screen"><div className="loader" /></div>;
+
+  if (dashboard?.hasSubscription) {
+    const start = new Date(dashboard.startDate);
+    const expiry = new Date(dashboard.expiryDate);
+    const totalDays = Math.max(1, Math.ceil((expiry - start) / (1000 * 60 * 60 * 24)));
+    const remaining = Math.max(0, Number(dashboard.remainingDays || 0));
+    const progress = Math.min(1, remaining / totalDays);
+    return (
+      <div className="payment-page animate-fade-in">
+        <h1 className="page-title">Manage Subscription</h1>
+        <p className="payment-subtitle">You are currently subscribed. Thank you!</p>
+        <div className="subscription-status glass-card">
+          <div className="status-ring" style={{ '--progress': progress }}>
+            <div className="status-inner">
+              <span className="status-days">{remaining}</span>
+              <span className="status-label">days left</span>
+            </div>
+          </div>
+          <div className="status-details">
+            <h3>{dashboard.plan}</h3>
+            <p>Start: {dashboard.startDate}</p>
+            <p>Expiry: {dashboard.expiryDate}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (success) {
     return (
