@@ -68,6 +68,13 @@ export default function AdminUsers() {
       <div className="admin-header">
         <Link to="/admin" className="back-link">← Admin</Link>
         <h1 className="page-title">Manage Users</h1>
+        <a
+          className="btn-glow btn-secondary btn-sm"
+          href="/api/admin/exports/users.csv"
+          style={{ marginLeft: 'auto' }}
+        >
+          Download CSV
+        </a>
       </div>
       {message && <div className="admin-message">{message}</div>}
       <div className="glass-card admin-section">

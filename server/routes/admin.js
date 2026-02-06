@@ -231,6 +231,70 @@ router.get('/settings', async (req, res) => {
   res.json({ settings });
 });
 
+function toCsvValue(value) {
+  if (value === null || value === undefined) return '';
+  const str = String(value);
+  if (/[",\n]/.test(str)) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
+router.get('/exports/users.csv', async (req, res) => {
+  const rows = await db.all(`
+    SELECT u.id, u.email, u.full_name, u.telegram_username, u.created_at, u.last_login,
+           (SELECT COUNT(*) FROM movie_requests mr WHERE mr.user_id = u.id) AS request_count,
+           s.plan, s.start_date, s.expiry_date
+    FROM users u
+    LEFT JOIN LATERAL (
+      SELECT plan, start_date, expiry_date
+      FROM subscriptions
+      WHERE user_id = u.id AND is_active = 1
+      ORDER BY expiry_date DESC
+      LIMIT 1
+    ) s ON true
+    WHERE u.role = 'user'
+    ORDER BY u.created_at DESC
+  `);
+
+  const header = [
+    'id',
+    'email',
+    'full_name',
+    'telegram_username',
+    'created_at',
+    'last_login',
+    'request_count',
+    'plan',
+    'start_date',
+    'expiry_date',
+  ];
+
+  const lines = [
+    header.join(','),
+    ...rows.map((r) =>
+      [
+        r.id,
+        r.email,
+        r.full_name,
+        r.telegram_username,
+        r.created_at,
+        r.last_login,
+        r.request_count,
+        r.plan,
+        r.start_date,
+        r.expiry_date,
+      ]
+        .map(toCsvValue)
+        .join(',')
+    ),
+  ];
+
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="movie-mayhem-users.csv"');
+  res.send(lines.join('\n'));
+});
+
 router.put('/settings/request-limit', async (req, res) => {
   const { value } = req.body;
   const num = parseInt(value, 10);
