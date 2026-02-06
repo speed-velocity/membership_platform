@@ -228,7 +228,7 @@ async function initDb() {
     console.log(`Admin created: ${adminEmail}`);
   }
 
-  await seedRecommendations({ get, run });
+  await seedRecommendations({ get, run, all });
 }
 
 module.exports = { initDb, query, get, all, run };

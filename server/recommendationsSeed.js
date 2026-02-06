@@ -13,12 +13,18 @@ const ACTION_RECOMMENDATIONS = [
   { title: 'Paatal lok', kind: 'Series', posterPath: 'posters/action/paatal-lok.jpg' },
   { title: 'The Terminal List', kind: 'Series', posterPath: 'posters/action/the-terminal-list.jpg' },
   { title: 'Spartacus', kind: 'Series', posterPath: 'posters/action/spartacus.jpg' },
-  { title: 'Rana Raidu', kind: 'Series', posterPath: 'posters/action/rana-raidu.jpg' },
+  { title: 'Rana Naidu', kind: 'Series', posterPath: 'posters/action/rana-naidu.jpg' },
 ];
 
 const GENRE_RECOMMENDATIONS = [
   { genre: 'Action', items: ACTION_RECOMMENDATIONS },
 ];
+
+function normalizeTitle(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '');
+}
 
 async function seedRecommendations(db) {
   for (const group of GENRE_RECOMMENDATIONS) {
@@ -30,6 +36,42 @@ async function seedRecommendations(db) {
          DO UPDATE SET poster_path = EXCLUDED.poster_path`,
         [group.genre, item.title, item.kind, item.posterPath || null]
       );
+    }
+
+    const canonical = new Map();
+    for (const item of group.items) {
+      const key = `${item.kind}|${normalizeTitle(item.title)}`;
+      canonical.set(key, item);
+    }
+
+    const existing = await db.all(
+      'SELECT id, title, kind, poster_path FROM weekly_recommendations WHERE LOWER(genre) = LOWER($1)',
+      [group.genre]
+    );
+
+    const seen = new Set();
+    for (const row of existing) {
+      const key = `${row.kind}|${normalizeTitle(row.title)}`;
+      const match = canonical.get(key);
+
+      if (!match) {
+        await db.run('DELETE FROM weekly_recommendations WHERE id = $1', [row.id]);
+        continue;
+      }
+
+      if (seen.has(key)) {
+        await db.run('DELETE FROM weekly_recommendations WHERE id = $1', [row.id]);
+        continue;
+      }
+
+      seen.add(key);
+      const desiredPoster = match.posterPath || null;
+      if (row.title !== match.title || row.poster_path !== desiredPoster) {
+        await db.run(
+          'UPDATE weekly_recommendations SET title = $1, poster_path = $2 WHERE id = $3',
+          [match.title, desiredPoster, row.id]
+        );
+      }
     }
   }
 }
