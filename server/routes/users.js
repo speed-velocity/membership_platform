@@ -128,7 +128,8 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
   );
   const deduped = new Map();
   for (const row of rows) {
-    const key = `${(row.kind || '').toLowerCase()}|${normalizeTitle(row.title)}`;
+    const kindKey = String(row.kind || '').trim().toLowerCase();
+    const key = `${kindKey}|${normalizeTitle(row.title)}`;
     const mappedPoster = ACTION_POSTERS[key];
     if ((!row.poster_path || row.poster_path !== mappedPoster) && mappedPoster) {
       row.poster_path = mappedPoster;
