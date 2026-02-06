@@ -29,8 +29,6 @@ const ACTION_POSTERS = {
   'series|ranaraidu': 'posters/action/rana-naidu.jpg',
 };
 
-const BLOCKED_RECOMMENDATIONS = new Set(['rananaidu', 'ranaraidu']);
-
 async function getActiveSubscription(userId) {
   const sub = await db.get(
     `
@@ -119,22 +117,23 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
   if (!genre) return res.json({ genre: null, content: [] });
   const rows = await db.all(
     `
-    SELECT r.id, r.title, r.kind, r.poster_path, r.created_at,
+    SELECT DISTINCT ON (lower(trim(r.kind)), regexp_replace(lower(r.title), '[^a-z0-9]+', '', 'g'))
+           r.id, r.title, r.kind, r.poster_path, r.created_at,
            rl.id as like_id
     FROM weekly_recommendations r
     LEFT JOIN weekly_recommendation_likes rl ON rl.recommendation_id = r.id AND rl.user_id = $2
     WHERE LOWER(r.genre) = LOWER($1)
-    ORDER BY r.created_at DESC
+    ORDER BY lower(trim(r.kind)),
+             regexp_replace(lower(r.title), '[^a-z0-9]+', '', 'g'),
+             (r.poster_path IS NOT NULL) DESC,
+             r.created_at DESC,
+             r.id DESC
   `,
     [genre, req.user.id]
   );
-  const deduped = new Map();
   for (const row of rows) {
     const kindKey = String(row.kind || '').trim().toLowerCase();
     const key = `${kindKey}|${normalizeTitle(row.title)}`;
-    if (BLOCKED_RECOMMENDATIONS.has(normalizeTitle(row.title))) {
-      continue;
-    }
     const mappedPoster = ACTION_POSTERS[key];
     if ((!row.poster_path || row.poster_path !== mappedPoster) && mappedPoster) {
       row.poster_path = mappedPoster;
@@ -143,17 +142,8 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
         row.id,
       ]);
     }
-
-    if (!deduped.has(key)) {
-      deduped.set(key, row);
-      continue;
-    }
-    const existing = deduped.get(key);
-    if (!existing.poster_path && row.poster_path) {
-      deduped.set(key, row);
-    }
   }
-  const content = Array.from(deduped.values()).map((r) => ({
+  const content = rows.map((r) => ({
     id: r.id,
     title: r.title,
     kind: r.kind,
