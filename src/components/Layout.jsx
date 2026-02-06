@@ -12,6 +12,22 @@ export default function Layout() {
     navigate(user?.role === 'admin' ? '/admin/login' : '/login');
   };
 
+  const handleDeleteAccount = async () => {
+    if (!user || user.role !== 'user') return;
+    const ok = window.confirm(
+      'Request account deletion? Admin will decide whether to remove or keep your data.'
+    );
+    if (!ok) return;
+    try {
+      await fetch('/api/users/request-delete', { method: 'POST', credentials: 'include' });
+      await logout();
+      navigate('/login');
+      alert('Deletion request sent to admin.');
+    } catch (e) {
+      alert('Failed to request deletion.');
+    }
+  };
+
   return (
     <div className="layout">
       <nav className="navbar">
@@ -30,7 +46,14 @@ export default function Layout() {
         </div>
         <div className="nav-user">
           <span className="user-email">{user?.email}</span>
-          <button className="btn-glow btn-secondary btn-sm" onClick={handleLogout}>Logout</button>
+          <div className="nav-actions">
+            <button className="btn-glow btn-secondary btn-sm" onClick={handleLogout}>Logout</button>
+            {user?.role === 'user' && (
+              <button className="btn-link-danger" onClick={handleDeleteAccount}>
+                Delete account
+              </button>
+            )}
+          </div>
         </div>
       </nav>
       <main className="main-content">

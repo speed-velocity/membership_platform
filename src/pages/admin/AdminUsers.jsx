@@ -12,11 +12,17 @@ export default function AdminUsers() {
   const [months, setMonths] = useState(1);
   const [expiryDates, setExpiryDates] = useState({});
   const [message, setMessage] = useState('');
+  const [deletions, setDeletions] = useState([]);
 
   useEffect(() => {
-    fetch(`${API}/admin/users`, { credentials: 'include' })
-      .then((r) => r.json())
-      .then((d) => setUsers(d.users || []))
+    Promise.all([
+      fetch(`${API}/admin/users`, { credentials: 'include' }).then((r) => r.json()),
+      fetch(`${API}/admin/deletions`, { credentials: 'include' }).then((r) => r.json()),
+    ])
+      .then(([usersRes, deletionsRes]) => {
+        setUsers(usersRes.users || []);
+        setDeletions(deletionsRes.requests || []);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -58,6 +64,25 @@ export default function AdminUsers() {
         .then((d) => setUsers(d.users || []));
     } catch (e) {
       setMessage(e.message || 'Failed');
+    }
+  };
+
+  const refreshDeletions = async () => {
+    const res = await fetch(`${API}/admin/deletions`, { credentials: 'include' });
+    const data = await res.json();
+    setDeletions(data.requests || []);
+  };
+
+  const handleDeletionAction = async (id, action) => {
+    try {
+      await fetch(`${API}/admin/deletions/${id}/${action}`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      setMessage(`Deletion request ${action === 'keep' ? 'kept' : 'removed'}.`);
+      refreshDeletions();
+    } catch (e) {
+      setMessage('Failed to update deletion request.');
     }
   };
 
@@ -132,6 +157,49 @@ export default function AdminUsers() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="glass-card admin-section">
+        <h2>Deletion Requests</h2>
+        {deletions.length === 0 ? (
+          <p className="admin-desc">No pending deletion requests.</p>
+        ) : (
+          <div className="table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Requested At</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {deletions.map((r) => (
+                  <tr key={r.id}>
+                    <td>{r.email}</td>
+                    <td>{r.created_at || '-'}</td>
+                    <td>
+                      <div className="admin-actions">
+                        <button
+                          className="btn-glow btn-secondary btn-sm"
+                          onClick={() => handleDeletionAction(r.id, 'keep')}
+                        >
+                          Keep Data
+                        </button>
+                        <button
+                          className="btn-glow btn-secondary btn-sm"
+                          onClick={() => handleDeletionAction(r.id, 'remove')}
+                        >
+                          Remove Data
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
       {selectedUser && (
         <div className="glass-card modal-overlay" style={{ marginTop: '2rem', padding: '2rem' }}>

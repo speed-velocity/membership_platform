@@ -104,9 +104,30 @@
   gap: 1rem;
 }
 
+.nav-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-end;
+}
+
 .user-email {
   font-size: 0.9rem;
   color: var(--text-muted);
+}
+
+.btn-link-danger {
+  background: none;
+  border: none;
+  color: #ff8da3;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.btn-link-danger:hover {
+  color: #ffb2c2;
 }
 
 .btn-sm {

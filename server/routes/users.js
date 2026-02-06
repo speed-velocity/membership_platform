@@ -73,6 +73,19 @@ router.put('/favorite-genre', authMiddleware, async (req, res) => {
   res.json({ ok: true, favoriteGenre: value });
 });
 
+router.post('/request-delete', authMiddleware, async (req, res) => {
+  const user = await db.get('SELECT id, email FROM users WHERE id = $1', [req.user.id]);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  await db.run('UPDATE users SET status = $1 WHERE id = $2', ['pending_delete', user.id]);
+  await db.run('DELETE FROM account_deletion_requests WHERE user_id = $1 AND status = $2', [user.id, 'pending']);
+  await db.run(
+    'INSERT INTO account_deletion_requests (user_id, email, status) VALUES ($1, $2, $3)',
+    [user.id, user.email, 'pending']
+  );
+  res.clearCookie('token');
+  res.json({ ok: true });
+});
+
 router.get('/recommendations', authMiddleware, async (req, res) => {
   const profile = await db.get('SELECT favorite_genre FROM users WHERE id = $1', [req.user.id]);
   const genre = profile?.favorite_genre;

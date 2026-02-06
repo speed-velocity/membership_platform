@@ -56,7 +56,9 @@ async function initDb() {
       last_login TIMESTAMP,
       full_name TEXT,
       telegram_username TEXT,
-      favorite_genre TEXT
+      favorite_genre TEXT,
+      status TEXT DEFAULT 'active',
+      deleted_at TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS subscriptions (
@@ -139,6 +141,17 @@ async function initDb() {
       FOREIGN KEY (content_id) REFERENCES content(id)
     );
 
+    CREATE TABLE IF NOT EXISTS account_deletion_requests (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER,
+      email TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      action TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      resolved_at TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_subscriptions_user ON subscriptions(user_id);
     CREATE INDEX IF NOT EXISTS idx_movie_requests_user ON movie_requests(user_id);
     CREATE INDEX IF NOT EXISTS idx_movie_requests_created ON movie_requests(created_at);
@@ -158,6 +171,9 @@ async function initDb() {
   }
 
   await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS favorite_genre TEXT');
+  await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS status TEXT');
+  await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP');
+  await query("UPDATE users SET status = 'active' WHERE status IS NULL");
 
   const adminEmail = config.adminEmail;
   const hasAdmin = await get('SELECT id FROM users WHERE email = $1', [adminEmail]);

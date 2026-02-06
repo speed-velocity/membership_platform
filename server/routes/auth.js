@@ -44,10 +44,16 @@ router.post('/login', async (req, res) => {
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password required' });
   }
-  const user = await db.get('SELECT id, email, password, role, full_name, favorite_genre FROM users WHERE email = $1', [email]);
+  const user = await db.get(
+    'SELECT id, email, password, role, full_name, favorite_genre, status FROM users WHERE email = $1',
+    [email]
+  );
   const pwd = user?.password ?? user?.Password;
   if (!user || !pwd || !bcrypt.compareSync(password, pwd)) {
     return res.status(401).json({ error: 'Invalid credentials' });
+  }
+  if (user.status && user.status !== 'active') {
+    return res.status(403).json({ error: 'Account pending deletion' });
   }
   await recordLogin(req, user);
   const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
@@ -61,7 +67,10 @@ router.post('/admin-login', async (req, res) => {
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password required' });
   }
-  const user = await db.get('SELECT id, email, password, role, full_name, favorite_genre FROM users WHERE email = $1', [email]);
+  const user = await db.get(
+    'SELECT id, email, password, role, full_name, favorite_genre, status FROM users WHERE email = $1',
+    [email]
+  );
   const pwd = user?.password ?? user?.Password;
   if (!user || !pwd || !bcrypt.compareSync(password, pwd)) {
     return res.status(401).json({ error: 'Invalid credentials' });
@@ -69,6 +78,9 @@ router.post('/admin-login', async (req, res) => {
   const role = user.role ?? user.Role;
   if (role !== 'admin') {
     return res.status(403).json({ error: 'Admin access only' });
+  }
+  if (user.status && user.status !== 'active') {
+    return res.status(403).json({ error: 'Account pending deletion' });
   }
   await recordLogin(req, user);
   const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });

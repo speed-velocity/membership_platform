@@ -231,6 +231,51 @@ router.get('/settings', async (req, res) => {
   res.json({ settings });
 });
 
+router.get('/deletions', async (req, res) => {
+  const rows = await db.all(`
+    SELECT r.id, r.user_id, r.email, r.status, r.created_at, r.resolved_at, r.action
+    FROM account_deletion_requests r
+    WHERE r.status = 'pending'
+    ORDER BY r.created_at DESC
+  `);
+  res.json({ requests: rows });
+});
+
+router.post('/deletions/:id/keep', async (req, res) => {
+  const { id } = req.params;
+  const reqRow = await db.get('SELECT id, user_id, email FROM account_deletion_requests WHERE id = $1', [id]);
+  if (!reqRow) return res.status(404).json({ error: 'Request not found' });
+  if (reqRow.user_id) {
+    await db.run('UPDATE users SET status = $1, deleted_at = NOW() WHERE id = $2', ['deleted', reqRow.user_id]);
+  }
+  await db.run(
+    "UPDATE account_deletion_requests SET status = 'kept', action = 'keep', resolved_at = NOW() WHERE id = $1",
+    [id]
+  );
+  res.json({ ok: true });
+});
+
+router.post('/deletions/:id/remove', async (req, res) => {
+  const { id } = req.params;
+  const reqRow = await db.get('SELECT id, user_id, email FROM account_deletion_requests WHERE id = $1', [id]);
+  if (!reqRow) return res.status(404).json({ error: 'Request not found' });
+  if (reqRow.user_id) {
+    const uid = reqRow.user_id;
+    await db.run('DELETE FROM subscriptions WHERE user_id = $1', [uid]);
+    await db.run('DELETE FROM movie_requests WHERE user_id = $1', [uid]);
+    await db.run('DELETE FROM login_history WHERE user_id = $1', [uid]);
+    await db.run('DELETE FROM password_resets WHERE user_id = $1', [uid]);
+    await db.run('DELETE FROM email_otps WHERE user_id = $1', [uid]);
+    await db.run('DELETE FROM watchlist WHERE user_id = $1', [uid]);
+    await db.run('DELETE FROM users WHERE id = $1', [uid]);
+  }
+  await db.run(
+    "UPDATE account_deletion_requests SET status = 'removed', action = 'remove', resolved_at = NOW() WHERE id = $1",
+    [id]
+  );
+  res.json({ ok: true });
+});
+
 function toCsvValue(value) {
   if (value === null || value === undefined) return '';
   const str = String(value);
