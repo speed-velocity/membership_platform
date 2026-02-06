@@ -13,6 +13,7 @@ import ContentPlayer from './pages/ContentPlayer';
 import MovieRequests from './pages/MovieRequests';
 import Watchlist from './pages/Watchlist';
 import FavoriteGenre from './pages/FavoriteGenre';
+import WeeklyPicks from './pages/WeeklyPicks';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminSubscriptions from './pages/admin/AdminSubscriptions';
@@ -66,6 +67,7 @@ export default function App() {
         <Route path="payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
         <Route path="content" element={<ProtectedRoute><Content /></ProtectedRoute>} />
         <Route path="content/:id" element={<ProtectedRoute><ContentPlayer /></ProtectedRoute>} />
+        <Route path="weekly-picks" element={<ProtectedRoute><WeeklyPicks /></ProtectedRoute>} />
         <Route path="watchlist" element={<ProtectedRoute><Watchlist /></ProtectedRoute>} />
         <Route path="requests" element={<ProtectedRoute><MovieRequests /></ProtectedRoute>} />
         <Route path="admin/subscriptions" element={<ProtectedRoute adminOnly><AdminSubscriptions /></ProtectedRoute>} />

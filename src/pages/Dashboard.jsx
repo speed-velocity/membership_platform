@@ -7,63 +7,13 @@ const API = '/api';
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [recommendations, setRecommendations] = useState([]);
-  const [recGenre, setRecGenre] = useState('');
-  const [recStatus, setRecStatus] = useState({});
 
   useEffect(() => {
-    Promise.all([
-      fetch(`${API}/users/dashboard`, { credentials: 'include' }).then((r) => r.json()),
-      fetch(`${API}/users/recommendations`, { credentials: 'include' }).then((r) => r.json()),
-    ])
-      .then(([dash, rec]) => {
-        setData(dash);
-        setRecommendations(rec?.content || []);
-        setRecGenre(rec?.genre || '');
-      })
+    fetch(`${API}/users/dashboard`, { credentials: 'include' })
+      .then((r) => r.json())
+      .then(setData)
       .finally(() => setLoading(false));
   }, []);
-
-  const requestRecommendation = async (item) => {
-    setRecStatus((s) => ({ ...s, [item.id]: { ...(s[item.id] || {}), requesting: true, error: '' } }));
-    try {
-      const res = await fetch(`${API}/requests`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ title: item.title, message: 'Requested from Weekly Picks' }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Request failed');
-      setRecStatus((s) => ({ ...s, [item.id]: { ...(s[item.id] || {}), requested: true, requesting: false } }));
-    } catch (e) {
-      setRecStatus((s) => ({ ...s, [item.id]: { ...(s[item.id] || {}), requesting: false, error: e.message } }));
-    }
-  };
-
-  const toggleLike = async (item) => {
-    const next = !item.liked;
-    setRecommendations((prev) =>
-      prev.map((r) => (r.id === item.id ? { ...r, liked: next } : r))
-    );
-    try {
-      if (next) {
-        await fetch(`${API}/users/recommendations/${item.id}/like`, {
-          method: 'POST',
-          credentials: 'include',
-        });
-      } else {
-        await fetch(`${API}/users/recommendations/${item.id}/like`, {
-          method: 'DELETE',
-          credentials: 'include',
-        });
-      }
-    } catch (e) {
-      setRecommendations((prev) =>
-        prev.map((r) => (r.id === item.id ? { ...r, liked: !next } : r))
-      );
-    }
-  };
 
   if (loading) return <div className="loading-screen"><div className="loader" /></div>;
 
@@ -141,51 +91,6 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        <div className="glass-card dashboard-card">
-          <h2>Weekly Picks {recGenre ? `· ${recGenre}` : ''}</h2>
-          {recommendations.length > 0 ? (
-            <div className="weekly-grid">
-              {recommendations.map((item) => (
-                <div key={item.id} className="weekly-card">
-                  <Link to={`/content/${item.id}`} className="weekly-thumb">
-                    {item.thumbnail_path ? (
-                      <img src={`/${item.thumbnail_path}`} alt={item.title} />
-                    ) : (
-                      <div className="weekly-placeholder">Movie</div>
-                    )}
-                  </Link>
-                  <div className="weekly-meta">
-                    <span className="weekly-title">{item.title}</span>
-                    <div className="weekly-actions">
-                      <button
-                        className="btn-glow btn-secondary btn-xs"
-                        onClick={() => requestRecommendation(item)}
-                        disabled={recStatus[item.id]?.requesting}
-                      >
-                        {recStatus[item.id]?.requested ? 'Requested' : 'Request'}
-                      </button>
-                      <button
-                        className={`btn-like ${item.liked ? 'active' : ''}`}
-                        onClick={() => toggleLike(item)}
-                      >
-                        {item.liked ? 'Liked' : 'Like'}
-                      </button>
-                    </div>
-                    {recStatus[item.id]?.error && (
-                      <span className="weekly-error">{recStatus[item.id].error}</span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="no-sub-desc">
-              {recGenre
-                ? 'No new picks yet. We will update this weekly.'
-                : 'Choose a favorite genre to unlock weekly recommendations.'}
-            </p>
-          )}
-        </div>
       </div>
     </div>
   );

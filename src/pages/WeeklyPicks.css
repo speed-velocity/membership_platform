@@ -1,0 +1,9 @@
+.weekly-page {
+  padding: 0;
+}
+
+.weekly-empty {
+  margin-top: 1.5rem;
+  padding: 2rem;
+  max-width: 600px;
+}
