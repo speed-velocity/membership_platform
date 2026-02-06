@@ -10,7 +10,7 @@ function normalizeTitle(value) {
     .replace(/[^a-z0-9]+/g, '');
 }
 
-const ACTION_POSTERS = {
+const POSTER_MAP = {
   'movie|raidredemption': 'posters/action/raid-redemption.jpg',
   'movie|oldboy': 'posters/action/oldboy.jpg',
   'movie|marco': 'posters/action/marco.jpg',
@@ -27,6 +27,21 @@ const ACTION_POSTERS = {
   'series|spartacus': 'posters/action/spartacus.jpg',
   'series|rananaidu': 'posters/action/rana-naidu.jpg',
   'series|ranaraidu': 'posters/action/rana-naidu.jpg',
+  'movie|aedilhaimushkil': 'posters/romance/ae-dil-hai-mushkil.jpg',
+  'movie|jabwemet': 'posters/romance/jab-we-met.jpg',
+  'movie|tamasha': 'posters/romance/tamasha.jpg',
+  'movie|kalhonaaho': 'posters/romance/kal-ho-naa-ho.jpg',
+  'movie|shiddat': 'posters/romance/shiddat.jpg',
+  'movie|raanjhanaa': 'posters/romance/raanjhanaa.jpg',
+  'movie|thenotebook': 'posters/romance/the-notebook.jpg',
+  'movie|lalaland': 'posters/romance/la-la-land.jpg',
+  'movie|titanic': 'posters/romance/titanic.jpg',
+  'movie|aashiqui2': 'posters/romance/aashiqui-2.jpg',
+  'series|modernlove': 'posters/romance/modern-love.jpg',
+  'series|feelslikeishq': 'posters/romance/feels-like-ishq.jpg',
+  'series|onedayseries': 'posters/romance/one-day-series.jpg',
+  'series|littlethings': 'posters/romance/little-things.jpg',
+  'series|brokenbutbeautiful': 'posters/romance/broken-but-beautiful.jpg',
 };
 
 async function getActiveSubscription(userId) {
@@ -134,7 +149,7 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
   for (const row of rows) {
     const kindKey = String(row.kind || '').trim().toLowerCase();
     const key = `${kindKey}|${normalizeTitle(row.title)}`;
-    const mappedPoster = ACTION_POSTERS[key];
+    const mappedPoster = POSTER_MAP[key];
     if ((!row.poster_path || row.poster_path !== mappedPoster) && mappedPoster) {
       row.poster_path = mappedPoster;
       await db.run('UPDATE weekly_recommendations SET poster_path = $1 WHERE id = $2', [

@@ -16,8 +16,27 @@ const ACTION_RECOMMENDATIONS = [
   { title: 'Rana Naidu', kind: 'Series', posterPath: 'posters/action/rana-naidu.jpg' },
 ];
 
+const ROMANCE_RECOMMENDATIONS = [
+  { title: 'Ae Dil Hai Mushkil', kind: 'Movie', posterPath: 'posters/romance/ae-dil-hai-mushkil.jpg' },
+  { title: 'Jab We Met', kind: 'Movie', posterPath: 'posters/romance/jab-we-met.jpg' },
+  { title: 'Tamasha', kind: 'Movie', posterPath: 'posters/romance/tamasha.jpg' },
+  { title: 'Kal Ho Naa Ho', kind: 'Movie', posterPath: 'posters/romance/kal-ho-naa-ho.jpg' },
+  { title: 'Shiddat', kind: 'Movie', posterPath: 'posters/romance/shiddat.jpg' },
+  { title: 'Raanjhanaa', kind: 'Movie', posterPath: 'posters/romance/raanjhanaa.jpg' },
+  { title: 'The Notebook', kind: 'Movie', posterPath: 'posters/romance/the-notebook.jpg' },
+  { title: 'La La Land', kind: 'Movie', posterPath: 'posters/romance/la-la-land.jpg' },
+  { title: 'Titanic', kind: 'Movie', posterPath: 'posters/romance/titanic.jpg' },
+  { title: 'Aashiqui 2', kind: 'Movie', posterPath: 'posters/romance/aashiqui-2.jpg' },
+  { title: 'Modern Love', kind: 'Series', posterPath: 'posters/romance/modern-love.jpg' },
+  { title: 'Feels Like Ishq', kind: 'Series', posterPath: 'posters/romance/feels-like-ishq.jpg' },
+  { title: 'One Day (Series)', kind: 'Series', posterPath: 'posters/romance/one-day-series.jpg' },
+  { title: 'Little Things', kind: 'Series', posterPath: 'posters/romance/little-things.jpg' },
+  { title: 'Broken But Beautiful', kind: 'Series', posterPath: 'posters/romance/broken-but-beautiful.jpg' },
+];
+
 const GENRE_RECOMMENDATIONS = [
   { genre: 'Action', items: ACTION_RECOMMENDATIONS },
+  { genre: 'Romance', items: ROMANCE_RECOMMENDATIONS },
 ];
 
 function normalizeTitle(value) {
