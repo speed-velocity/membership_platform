@@ -4,6 +4,31 @@ const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
+function normalizeTitle(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '');
+}
+
+const ACTION_POSTERS = {
+  'movie|raidredemption': 'posters/action/raid-redemption.jpg',
+  'movie|oldboy': 'posters/action/oldboy.jpg',
+  'movie|marco': 'posters/action/marco.jpg',
+  'movie|hitthethirdcase': 'posters/action/hit-the-third-case.jpg',
+  'movie|dhurandhar': 'posters/action/dhurandhar.jpg',
+  'movie|war': 'posters/action/war.jpg',
+  'movie|fightclub': 'posters/action/fight-club.jpg',
+  'movie|rockyhandsome': 'posters/action/rocky-handsome.jpg',
+  'movie|tenet': 'posters/action/tenet.jpg',
+  'movie|extraction': 'posters/action/extraction.jpg',
+  'series|banshee': 'posters/action/banshee.jpg',
+  'series|paatallok': 'posters/action/paatal-lok.jpg',
+  'series|theterminallist': 'posters/action/the-terminal-list.jpg',
+  'series|spartacus': 'posters/action/spartacus.jpg',
+  'series|rananaidu': 'posters/action/rana-naidu.jpg',
+  'series|ranaraidu': 'posters/action/rana-naidu.jpg',
+};
+
 async function getActiveSubscription(userId) {
   const sub = await db.get(
     `
@@ -103,7 +128,16 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
   );
   const deduped = new Map();
   for (const row of rows) {
-    const key = `${row.kind}|${(row.title || '').trim().toLowerCase()}`;
+    const key = `${(row.kind || '').toLowerCase()}|${normalizeTitle(row.title)}`;
+    const mappedPoster = ACTION_POSTERS[key];
+    if ((!row.poster_path || row.poster_path !== mappedPoster) && mappedPoster) {
+      row.poster_path = mappedPoster;
+      await db.run('UPDATE weekly_recommendations SET poster_path = $1 WHERE id = $2', [
+        mappedPoster,
+        row.id,
+      ]);
+    }
+
     if (!deduped.has(key)) {
       deduped.set(key, row);
       continue;
