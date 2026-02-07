@@ -109,6 +109,7 @@ export default function AdminUsers() {
             <thead>
               <tr>
                 <th>Email</th>
+                <th>Genre</th>
                 <th>Last Login</th>
                 <th>Requests</th>
                 <th>Plan</th>
@@ -121,6 +122,7 @@ export default function AdminUsers() {
               {users.map((u) => (
                 <tr key={u.id}>
                   <td>{u.email}</td>
+                  <td>{u.favorite_genre || u.favoriteGenre || '-'}</td>
                   <td>{u.last_login || '-'}</td>
                   <td>{u.request_count ?? 0}</td>
                   <td>{u.subscription?.plan || '-'}</td>

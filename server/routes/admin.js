@@ -37,6 +37,7 @@ router.get('/users', async (req, res) => {
       role,
       created_at,
       last_login,
+      favorite_genre,
       (SELECT COUNT(*) FROM movie_requests mr WHERE mr.user_id = users.id) AS request_count
     FROM users
     WHERE role = $1
