@@ -264,6 +264,16 @@ router.get('/settings', async (req, res) => {
   res.json({ settings });
 });
 
+router.put('/settings/about', async (req, res) => {
+  const { value } = req.body || {};
+  const content = (value || '').trim();
+  await db.run(
+    'INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value',
+    ['about_content', content]
+  );
+  res.json({ ok: true, value: content });
+});
+
 router.get('/deletions', async (req, res) => {
   const rows = await db.all(`
     SELECT r.id, r.user_id, r.email, r.status, r.created_at, r.resolved_at, r.action

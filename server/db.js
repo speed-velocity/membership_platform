@@ -218,6 +218,18 @@ async function initDb() {
     await query("INSERT INTO settings (key, value) VALUES ('request_limit_per_12h', '2')");
   }
 
+  const defaultAbout = [
+    'Movie Mayhem is your ultimate destination for unlimited entertainment. We bring you a massive collection of Hollywood, Bollywood, South Indian, and Web Series content, carefully curated for movie lovers who crave quality and variety.',
+    'Our mission is simple - to deliver fast, reliable, and high-quality access to the latest movies and trending web series, all in one place. From action-packed blockbusters and mind-bending thrillers to romantic dramas, horror, comedy, and gore, Movie Mayhem covers every genre to match your mood.',
+  ].join('\n\n');
+  const aboutContent = await get('SELECT value FROM settings WHERE key = $1', ['about_content']);
+  if (!aboutContent || !String(aboutContent.value || '').trim()) {
+    await query(
+      'INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value',
+      ['about_content', defaultAbout]
+    );
+  }
+
   await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS favorite_genre TEXT');
   await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS status TEXT');
   await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP');

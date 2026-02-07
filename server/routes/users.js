@@ -158,6 +158,11 @@ router.put('/favorite-genre', authMiddleware, async (req, res) => {
   res.json({ ok: true, favoriteGenre: value });
 });
 
+router.get('/about', authMiddleware, async (req, res) => {
+  const row = await db.get('SELECT value FROM settings WHERE key = $1', ['about_content']);
+  res.json({ content: row?.value || '' });
+});
+
 router.post('/reset-genre', authMiddleware, async (req, res) => {
   await db.run('UPDATE users SET favorite_genre = NULL WHERE id = $1', [req.user.id]);
   res.json({ ok: true, favoriteGenre: null });

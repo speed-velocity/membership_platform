@@ -7,11 +7,16 @@ const API = '/api';
 export default function AdminSettings() {
   const [limit, setLimit] = useState(2);
   const [saved, setSaved] = useState(false);
+  const [aboutText, setAboutText] = useState('');
+  const [aboutSaved, setAboutSaved] = useState(false);
 
   useEffect(() => {
     fetch(`${API}/admin/settings`, { credentials: 'include' })
       .then((r) => r.json())
-      .then((d) => setLimit(parseInt(d.settings?.request_limit_per_12h || '2', 10)));
+      .then((d) => {
+        setLimit(parseInt(d.settings?.request_limit_per_12h || '2', 10));
+        setAboutText(d.settings?.about_content || '');
+      });
   }, []);
 
   const saveLimit = async () => {
@@ -31,6 +36,21 @@ export default function AdminSettings() {
       setTimeout(() => setSaved(false), 2000);
     } catch (e) {
       alert('Failed to save');
+    }
+  };
+
+  const saveAbout = async () => {
+    try {
+      await fetch(`${API}/admin/settings/about`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ value: aboutText }),
+      });
+      setAboutSaved(true);
+      setTimeout(() => setAboutSaved(false), 2000);
+    } catch (e) {
+      alert('Failed to save about content');
     }
   };
 
@@ -56,6 +76,21 @@ export default function AdminSettings() {
           <button className="btn-glow btn-primary" onClick={saveLimit}>Save</button>
         </div>
         {saved && <span className="saved-msg">Saved!</span>}
+      </div>
+
+      <div className="glass-card admin-section">
+        <h2>About Content</h2>
+        <p className="admin-desc">This text appears on the About page for all users.</p>
+        <textarea
+          rows={8}
+          value={aboutText}
+          onChange={(e) => setAboutText(e.target.value)}
+          placeholder="Write your About message..."
+        />
+        <div className="admin-actions" style={{ marginTop: '1rem' }}>
+          <button className="btn-glow btn-primary" onClick={saveAbout}>Save About</button>
+          {aboutSaved && <span className="saved-msg">Saved!</span>}
+        </div>
       </div>
     </div>
   );
