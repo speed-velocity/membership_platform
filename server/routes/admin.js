@@ -57,6 +57,38 @@ router.get('/users', async (req, res) => {
   res.json({ users: withSubs });
 });
 
+router.get('/weekly-likes', async (req, res) => {
+  const rows = await db.all(`
+    SELECT
+      u.id,
+      u.email,
+      u.full_name,
+      u.favorite_genre,
+      COUNT(rl.id) AS like_count,
+      COALESCE(
+        ARRAY_AGG(r.title ORDER BY r.title) FILTER (WHERE r.title IS NOT NULL),
+        '{}'
+      ) AS liked_titles
+    FROM users u
+    LEFT JOIN weekly_recommendation_likes rl ON rl.user_id = u.id
+    LEFT JOIN weekly_recommendations r ON r.id = rl.recommendation_id
+    WHERE u.role = $1
+    GROUP BY u.id
+    ORDER BY like_count DESC, u.created_at DESC
+  `, ['user']);
+  res.json({ users: rows });
+});
+
+router.get('/user-genres', async (req, res) => {
+  const rows = await db.all(`
+    SELECT id, email, full_name, favorite_genre
+    FROM users
+    WHERE role = $1
+    ORDER BY created_at DESC
+  `, ['user']);
+  res.json({ users: rows });
+});
+
 router.post('/subscriptions', async (req, res) => {
   const { userId, plan, months } = req.body;
   if (!userId || !plan || !months) {
