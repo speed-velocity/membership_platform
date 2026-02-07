@@ -57,6 +57,21 @@ const POSTER_MAP = {
   'series|breakingbad': 'posters/thriller/breaking-bad.jpg',
   'series|sacredgames': 'posters/thriller/sacred-games.jpg',
   'series|asur': 'posters/thriller/asur.jpg',
+  'movie|thehangover': 'posters/comedy/the-hangover.jpg',
+  'movie|superbad': 'posters/comedy/superbad.jpg',
+  'movie|21jumpstreet': 'posters/comedy/21-jump-street.jpg',
+  'movie|werethemillers': 'posters/comedy/were-the-millers.jpg',
+  'movie|deadpool': 'posters/comedy/deadpool.jpg',
+  'movie|herapheri': 'posters/comedy/hera-pheri.jpg',
+  'movie|phirherapheri': 'posters/comedy/phir-hera-pheri.jpg',
+  'movie|dhamaal': 'posters/comedy/dhamaal.jpg',
+  'movie|golmaal': 'posters/comedy/golmaal.jpg',
+  'movie|chupchupke': 'posters/comedy/chup-chup-ke.jpg',
+  'series|friends': 'posters/comedy/friends.jpg',
+  'series|theofficeus': 'posters/comedy/the-office-us.jpg',
+  'series|brooklynninenine': 'posters/comedy/brooklyn-nine-nine.jpg',
+  'series|panchayat': 'posters/comedy/panchayat.jpg',
+  'series|tvfpitchers': 'posters/comedy/tvf-pitchers.jpg',
 };
 
 async function getActiveSubscription(userId) {

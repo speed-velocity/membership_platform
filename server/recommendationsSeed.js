@@ -52,10 +52,29 @@ const THRILLER_RECOMMENDATIONS = [
   { title: 'Asur', kind: 'Series', posterPath: 'posters/thriller/asur.jpg' },
 ];
 
+const COMEDY_RECOMMENDATIONS = [
+  { title: 'The Hangover', kind: 'Movie', posterPath: 'posters/comedy/the-hangover.jpg' },
+  { title: 'Superbad', kind: 'Movie', posterPath: 'posters/comedy/superbad.jpg' },
+  { title: '21 Jump Street', kind: 'Movie', posterPath: 'posters/comedy/21-jump-street.jpg' },
+  { title: "We're the Millers", kind: 'Movie', posterPath: 'posters/comedy/were-the-millers.jpg' },
+  { title: 'Deadpool', kind: 'Movie', posterPath: 'posters/comedy/deadpool.jpg' },
+  { title: 'Hera Pheri', kind: 'Movie', posterPath: 'posters/comedy/hera-pheri.jpg' },
+  { title: 'Phir Hera Pheri', kind: 'Movie', posterPath: 'posters/comedy/phir-hera-pheri.jpg' },
+  { title: 'Dhamaal', kind: 'Movie', posterPath: 'posters/comedy/dhamaal.jpg' },
+  { title: 'Golmaal', kind: 'Movie', posterPath: 'posters/comedy/golmaal.jpg' },
+  { title: 'Chup Chup Ke', kind: 'Movie', posterPath: 'posters/comedy/chup-chup-ke.jpg' },
+  { title: 'Friends', kind: 'Series', posterPath: 'posters/comedy/friends.jpg' },
+  { title: 'The Office (US)', kind: 'Series', posterPath: 'posters/comedy/the-office-us.jpg' },
+  { title: 'Brooklyn Nine-Nine', kind: 'Series', posterPath: 'posters/comedy/brooklyn-nine-nine.jpg' },
+  { title: 'Panchayat', kind: 'Series', posterPath: 'posters/comedy/panchayat.jpg' },
+  { title: 'TVF Pitchers', kind: 'Series', posterPath: 'posters/comedy/tvf-pitchers.jpg' },
+];
+
 const GENRE_RECOMMENDATIONS = [
   { genre: 'Action', items: ACTION_RECOMMENDATIONS },
   { genre: 'Romance', items: ROMANCE_RECOMMENDATIONS },
   { genre: 'Thriller', items: THRILLER_RECOMMENDATIONS },
+  { genre: 'Comedy', items: COMEDY_RECOMMENDATIONS },
 ];
 
 function normalizeTitle(value) {
