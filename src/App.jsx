@@ -14,6 +14,7 @@ import MovieRequests from './pages/MovieRequests';
 import Watchlist from './pages/Watchlist';
 import FavoriteGenre from './pages/FavoriteGenre';
 import WeeklyPicks from './pages/WeeklyPicks';
+import About from './pages/About';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminSubscriptions from './pages/admin/AdminSubscriptions';
@@ -73,6 +74,7 @@ export default function App() {
         <Route path="weekly-picks" element={<ProtectedRoute><WeeklyPicks /></ProtectedRoute>} />
         <Route path="watchlist" element={<ProtectedRoute><Watchlist /></ProtectedRoute>} />
         <Route path="requests" element={<ProtectedRoute><MovieRequests /></ProtectedRoute>} />
+        <Route path="about" element={<ProtectedRoute><About /></ProtectedRoute>} />
         <Route path="admin/subscriptions" element={<ProtectedRoute adminOnly><AdminSubscriptions /></ProtectedRoute>} />
         <Route path="admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
         <Route path="admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />

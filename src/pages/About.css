@@ -1,0 +1,14 @@
+.about-page {
+  padding: 0;
+}
+
+.about-card {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+}

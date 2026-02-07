@@ -76,6 +76,15 @@ export default function Layout() {
             className="btn-glow btn-secondary btn-sm"
             onClick={() => {
               setMenuOpen(false);
+              navigate('/about');
+            }}
+          >
+            About
+          </button>
+          <button
+            className="btn-glow btn-secondary btn-sm"
+            onClick={() => {
+              setMenuOpen(false);
               handleLogout();
             }}
           >
