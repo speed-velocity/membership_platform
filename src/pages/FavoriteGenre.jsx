@@ -9,7 +9,6 @@ const GENRES = [
   { id: 'thriller', label: 'Thriller', icon: 'T', blurb: 'Tension & edge-of-seat' },
   { id: 'comedy', label: 'Comedy', icon: 'C', blurb: 'Light, fun & clever' },
   { id: 'horror', label: 'Horror', icon: 'H', blurb: 'Dark, eerie & spooky' },
-  { id: 'scifi', label: 'Sci-Fi', icon: 'S', blurb: 'Futuristic & mind-bending' },
 ];
 
 const PARTICLES = [
