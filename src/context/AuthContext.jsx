@@ -13,9 +13,11 @@ export function AuthProvider({ children }) {
     if (!u) return u;
     const rawGenre = u.favoriteGenre ?? u.favorite_genre ?? null;
     const favoriteGenre = rawGenre && allowedGenres.has(rawGenre) ? rawGenre : null;
+    const avatarUrl = u.avatarUrl ?? u.avatar_url ?? null;
     return {
       ...u,
       favoriteGenre,
+      avatarUrl,
     };
   };
 
@@ -94,6 +96,18 @@ export function AuthProvider({ children }) {
     return data;
   };
 
+  const setUserAvatar = async (file) => {
+    const form = new FormData();
+    form.append('avatar', file);
+    const data = await fetchJson(`${API}/users/avatar`, {
+      method: 'POST',
+      credentials: 'include',
+      body: form,
+    });
+    setUser((prev) => (prev ? { ...prev, avatarUrl: data.avatarUrl } : prev));
+    return data;
+  };
+
   const resetUserGenre = async () => {
     const data = await fetchJson(`${API}/users/reset-genre`, {
       method: 'POST',
@@ -104,7 +118,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, adminLogin, logout, setUserFavoriteGenre, resetUserGenre }}>
+    <AuthContext.Provider value={{ user, loading, login, register, adminLogin, logout, setUserFavoriteGenre, resetUserGenre, setUserAvatar }}>
       {children}
     </AuthContext.Provider>
   );

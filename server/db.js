@@ -57,6 +57,7 @@ async function initDb() {
       last_login TIMESTAMP,
       full_name TEXT,
       telegram_username TEXT,
+      avatar_url TEXT,
       favorite_genre TEXT,
       status TEXT DEFAULT 'active',
       deleted_at TIMESTAMP
@@ -231,6 +232,7 @@ async function initDb() {
   }
 
   await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS favorite_genre TEXT');
+  await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT');
   await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS status TEXT');
   await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP');
   await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS wishlist_titles TEXT[]');

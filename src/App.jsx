@@ -13,6 +13,7 @@ import ContentPlayer from './pages/ContentPlayer';
 import MovieRequests from './pages/MovieRequests';
 import Watchlist from './pages/Watchlist';
 import FavoriteGenre from './pages/FavoriteGenre';
+import AvatarSetup from './pages/AvatarSetup';
 import WeeklyPicks from './pages/WeeklyPicks';
 import About from './pages/About';
 import AdminLogin from './pages/admin/AdminLogin';
@@ -65,6 +66,7 @@ export default function App() {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/onboarding/genre" element={<ProtectedRoute requireGenre={false}><FavoriteGenre /></ProtectedRoute>} />
+      <Route path="/onboarding/avatar" element={<ProtectedRoute requireGenre={false}><AvatarSetup /></ProtectedRoute>} />
       <Route path="/" element={<Layout />}>
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

@@ -21,6 +21,7 @@ const uploadsDir = path.join(__dirname, '..', 'uploads');
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 if (!fs.existsSync(path.join(uploadsDir, 'content'))) fs.mkdirSync(path.join(uploadsDir, 'content'), { recursive: true });
+if (!fs.existsSync(path.join(uploadsDir, 'avatars'))) fs.mkdirSync(path.join(uploadsDir, 'avatars'), { recursive: true });
 
 const allowedOrigins = [
   'http://localhost:5173',
