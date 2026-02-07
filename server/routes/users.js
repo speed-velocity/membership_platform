@@ -1,36 +1,9 @@
 const express = require('express');
-const path = require('path');
-const fs = require('fs');
-const multer = require('multer');
 const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
-const avatarDir = path.join(__dirname, '..', '..', 'uploads', 'avatars');
-if (!fs.existsSync(avatarDir)) fs.mkdirSync(avatarDir, { recursive: true });
-
-const avatarStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, avatarDir),
-  filename: (req, file, cb) => {
-    const safeName = (file.originalname || 'avatar')
-      .replace(/\s+/g, '-')
-      .replace(/[^a-zA-Z0-9.-]/g, '')
-      .toLowerCase();
-    cb(null, `${Date.now()}-${safeName}`);
-  },
-});
-
-const avatarUpload = multer({
-  storage: avatarStorage,
-  limits: { fileSize: 2 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    if (!file.mimetype?.startsWith('image/')) {
-      return cb(new Error('Only image files are allowed'));
-    }
-    cb(null, true);
-  },
-});
 
 function normalizeTitle(value) {
   return String(value || '')
@@ -186,12 +159,6 @@ router.put('/favorite-genre', authMiddleware, async (req, res) => {
   res.json({ ok: true, favoriteGenre: value });
 });
 
-router.post('/avatar', authMiddleware, avatarUpload.single('avatar'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'Avatar file required' });
-  const avatarUrl = `uploads/avatars/${req.file.filename}`;
-  await db.run('UPDATE users SET avatar_url = $1 WHERE id = $2', [avatarUrl, req.user.id]);
-  res.json({ ok: true, avatarUrl });
-});
 
 router.get('/about', authMiddleware, async (req, res) => {
   const row = await db.get('SELECT value FROM settings WHERE key = $1', ['about_content']);

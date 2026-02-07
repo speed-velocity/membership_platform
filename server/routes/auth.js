@@ -26,7 +26,7 @@ router.post('/register', async (req, res) => {
       [email, hashed, 'user', fullName]
     );
     const user = await db.get(
-      'SELECT id, email, role, full_name, favorite_genre, avatar_url FROM users WHERE email = $1',
+      'SELECT id, email, role, full_name, favorite_genre FROM users WHERE email = $1',
       [email]
     );
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
@@ -38,7 +38,6 @@ router.post('/register', async (req, res) => {
         email: user.email,
         role: user.role,
         favoriteGenre: user.favorite_genre || null,
-        avatarUrl: user.avatar_url || null,
       },
       token,
     });
@@ -57,7 +56,7 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({ error: 'Email and password required' });
   }
   const user = await db.get(
-    'SELECT id, email, password, role, full_name, favorite_genre, avatar_url, status FROM users WHERE email = $1',
+    'SELECT id, email, password, role, full_name, favorite_genre, status FROM users WHERE email = $1',
     [email]
   );
   const pwd = user?.password ?? user?.Password;
@@ -76,7 +75,6 @@ router.post('/login', async (req, res) => {
       email: user.email,
       role: user.role,
       favoriteGenre: user.favorite_genre || null,
-      avatarUrl: user.avatar_url || null,
     },
     token,
   });
@@ -89,7 +87,7 @@ router.post('/admin-login', async (req, res) => {
     return res.status(400).json({ error: 'Email and password required' });
   }
   const user = await db.get(
-    'SELECT id, email, password, role, full_name, favorite_genre, avatar_url, status FROM users WHERE email = $1',
+    'SELECT id, email, password, role, full_name, favorite_genre, status FROM users WHERE email = $1',
     [email]
   );
   const pwd = user?.password ?? user?.Password;
@@ -112,7 +110,6 @@ router.post('/admin-login', async (req, res) => {
       email: user.email,
       role: user.role,
       favoriteGenre: user.favorite_genre || null,
-      avatarUrl: user.avatar_url || null,
     },
     token,
   });
@@ -248,7 +245,6 @@ router.get('/me', authMiddleware, (req, res) => {
     user: {
       ...user,
       favoriteGenre: user.favorite_genre || null,
-      avatarUrl: user.avatar_url || null,
     },
   });
 });

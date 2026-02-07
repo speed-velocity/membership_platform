@@ -40,9 +40,8 @@ export default function FavoriteGenre() {
     setLoading(true);
     setError('');
     try {
-      const hasAvatar = !!user?.avatarUrl;
       await setUserFavoriteGenre(selected);
-      navigate(hasAvatar ? '/dashboard' : '/onboarding/avatar');
+      navigate('/dashboard');
     } catch (e) {
       setError(e.message || 'Failed to save genre');
     } finally {
