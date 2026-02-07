@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import './Layout.css';
 
 export default function Layout() {
-  const { user, logout } = useAuth();
+  const { user, logout, resetUserGenre } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = React.useState(false);
 
@@ -26,6 +26,19 @@ export default function Layout() {
       alert('Deletion request sent to admin.');
     } catch (e) {
       alert('Failed to request deletion.');
+    }
+  };
+
+  const handleResetGenre = async () => {
+    if (!user || user.role !== 'user') return;
+    const ok = window.confirm('Reset your favorite genre and choose again?');
+    if (!ok) return;
+    try {
+      await resetUserGenre();
+      setMenuOpen(false);
+      navigate('/onboarding/genre');
+    } catch (e) {
+      alert('Failed to reset genre.');
     }
   };
 
@@ -52,6 +65,11 @@ export default function Layout() {
               }}
             >
               Manage Subscription
+            </button>
+          )}
+          {user?.role === 'user' && (
+            <button className="btn-glow btn-secondary btn-sm" onClick={handleResetGenre}>
+              Reset Genre
             </button>
           )}
           <button

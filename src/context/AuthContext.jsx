@@ -94,8 +94,17 @@ export function AuthProvider({ children }) {
     return data;
   };
 
+  const resetUserGenre = async () => {
+    const data = await fetchJson(`${API}/users/reset-genre`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    setUser((prev) => (prev ? { ...prev, favoriteGenre: null } : prev));
+    return data;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, adminLogin, logout, setUserFavoriteGenre }}>
+    <AuthContext.Provider value={{ user, loading, login, register, adminLogin, logout, setUserFavoriteGenre, resetUserGenre }}>
       {children}
     </AuthContext.Provider>
   );
