@@ -7,8 +7,14 @@ export default function Layout() {
   const { user, logout, resetUserGenre, setUserAvatar } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [avatarMenuOpen, setAvatarMenuOpen] = React.useState(false);
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+    setAvatarMenuOpen(false);
+  };
 
   const handleLogout = () => {
     logout();
@@ -37,7 +43,7 @@ export default function Layout() {
     if (!ok) return;
     try {
       await resetUserGenre();
-      setMenuOpen(false);
+      closeMenu();
       navigate('/onboarding/genre');
     } catch (e) {
       alert('Failed to reset genre.');
@@ -58,12 +64,12 @@ export default function Layout() {
     <div className="layout">
       <div
         className={`side-backdrop ${menuOpen ? 'open' : ''}`}
-        onClick={() => setMenuOpen(false)}
+        onClick={closeMenu}
       />
       <aside className={`side-panel ${menuOpen ? 'open' : ''}`}>
         <div className="side-panel-header">
           <span className="side-title">Movie Mayhem</span>
-          <button className="side-close" onClick={() => setMenuOpen(false)} aria-label="Close menu">
+          <button className="side-close" onClick={closeMenu} aria-label="Close menu">
             ×
           </button>
         </div>
@@ -72,7 +78,7 @@ export default function Layout() {
             <button
               className="btn-glow btn-secondary btn-sm"
               onClick={() => {
-                setMenuOpen(false);
+                closeMenu();
                 navigate('/payment');
               }}
             >
@@ -87,23 +93,37 @@ export default function Layout() {
           {user?.role === 'user' && (
             <button
               className="btn-glow btn-secondary btn-sm"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => setAvatarMenuOpen((prev) => !prev)}
             >
               Update Profile Photo
             </button>
           )}
-          {user?.role === 'user' && (
-            <button
-              className="btn-glow btn-secondary btn-sm"
-              onClick={() => cameraInputRef.current?.click()}
-            >
-              Use Camera
-            </button>
+          {user?.role === 'user' && avatarMenuOpen && (
+            <div className="avatar-menu">
+              <button
+                className="btn-glow btn-secondary btn-sm"
+                onClick={() => {
+                  setAvatarMenuOpen(false);
+                  cameraInputRef.current?.click();
+                }}
+              >
+                Use Camera
+              </button>
+              <button
+                className="btn-glow btn-secondary btn-sm"
+                onClick={() => {
+                  setAvatarMenuOpen(false);
+                  fileInputRef.current?.click();
+                }}
+              >
+                File Manager
+              </button>
+            </div>
           )}
           <button
             className="btn-glow btn-secondary btn-sm"
             onClick={() => {
-              setMenuOpen(false);
+              closeMenu();
               navigate('/about');
             }}
           >
@@ -112,7 +132,7 @@ export default function Layout() {
           <button
             className="btn-glow btn-secondary btn-sm"
             onClick={() => {
-              setMenuOpen(false);
+              closeMenu();
               handleLogout();
             }}
           >
