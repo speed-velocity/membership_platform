@@ -158,6 +158,23 @@ router.put('/favorite-genre', authMiddleware, async (req, res) => {
   res.json({ ok: true, favoriteGenre: value });
 });
 
+router.get('/wishlist', authMiddleware, async (req, res) => {
+  const row = await db.get('SELECT wishlist_titles FROM users WHERE id = $1', [req.user.id]);
+  const titles = Array.isArray(row?.wishlist_titles) ? row.wishlist_titles : [];
+  res.json({ titles });
+});
+
+router.put('/wishlist', authMiddleware, async (req, res) => {
+  const { titles } = req.body || {};
+  if (!Array.isArray(titles)) {
+    return res.status(400).json({ error: 'titles array required' });
+  }
+  const cleaned = titles.map((title) => (title || '').trim()).slice(0, 5);
+  while (cleaned.length < 5) cleaned.push('');
+  await db.run('UPDATE users SET wishlist_titles = $1 WHERE id = $2', [cleaned, req.user.id]);
+  res.json({ ok: true, titles: cleaned });
+});
+
 router.post('/request-delete', authMiddleware, async (req, res) => {
   const user = await db.get('SELECT id, email FROM users WHERE id = $1', [req.user.id]);
   if (!user) return res.status(404).json({ error: 'User not found' });

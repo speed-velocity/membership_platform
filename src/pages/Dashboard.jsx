@@ -83,7 +83,7 @@ export default function Dashboard() {
           </Link>
           <Link to="/watchlist" className="action-link">
             <span className="action-icon">â˜…</span>
-            <span>Your Watchlist</span>
+            <span>Your Wishlist</span>
           </Link>
           <Link to="/requests" className="action-link">
             <span className="action-icon">âœ‰</span>

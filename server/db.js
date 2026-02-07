@@ -221,6 +221,7 @@ async function initDb() {
   await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS favorite_genre TEXT');
   await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS status TEXT');
   await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP');
+  await query('ALTER TABLE users ADD COLUMN IF NOT EXISTS wishlist_titles TEXT[]');
   await query("UPDATE users SET status = 'active' WHERE status IS NULL");
 
   const adminEmail = config.adminEmail;
