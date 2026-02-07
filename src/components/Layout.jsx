@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Layout.css';
 
 export default function Layout() {
-  const { user, logout, resetUserGenre } = useAuth();
+  const { user, logout, resetUserGenre, setUserAvatar } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
 
   const handleLogout = () => {
     logout();
@@ -42,6 +44,16 @@ export default function Layout() {
     }
   };
 
+  const handleAvatarFile = async (file) => {
+    if (!file) return;
+    try {
+      await setUserAvatar(file);
+      alert('Profile photo updated.');
+    } catch (e) {
+      alert(e.message || 'Failed to update photo.');
+    }
+  };
+
   return (
     <div className="layout">
       <div
@@ -72,6 +84,22 @@ export default function Layout() {
               Reset Genre
             </button>
           )}
+          {user?.role === 'user' && (
+            <button
+              className="btn-glow btn-secondary btn-sm"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Update Profile Photo
+            </button>
+          )}
+          {user?.role === 'user' && (
+            <button
+              className="btn-glow btn-secondary btn-sm"
+              onClick={() => cameraInputRef.current?.click()}
+            >
+              Use Camera
+            </button>
+          )}
           <button
             className="btn-glow btn-secondary btn-sm"
             onClick={() => {
@@ -95,6 +123,21 @@ export default function Layout() {
               Delete account
             </button>
           )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleAvatarFile(e.target.files?.[0])}
+            style={{ display: 'none' }}
+          />
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={(e) => handleAvatarFile(e.target.files?.[0])}
+            style={{ display: 'none' }}
+          />
         </div>
       </aside>
 
