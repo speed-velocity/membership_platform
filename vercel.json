@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/uploads/:path*",
+      "destination": "https://membership-platform-api.onrender.com/uploads/:path*"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://membership-platform-api.onrender.com/api/:path*"
     },
