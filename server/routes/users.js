@@ -72,6 +72,21 @@ const POSTER_MAP = {
   'series|brooklynninenine': 'posters/comedy/brooklyn-nine-nine.jpg',
   'series|panchayat': 'posters/comedy/panchayat.jpg',
   'series|tvfpitchers': 'posters/comedy/tvf-pitchers.jpg',
+  'movie|theconjuring': 'posters/horror/the-conjuring.jpg',
+  'movie|insidious': 'posters/horror/insidious.jpg',
+  'movie|sinister': 'posters/horror/sinister.jpg',
+  'movie|hereditary': 'posters/horror/hereditary.jpg',
+  'movie|it': 'posters/horror/it.jpg',
+  'movie|tumbbad': 'posters/horror/tumbbad.jpg',
+  'movie|stree': 'posters/horror/stree.jpg',
+  'movie|1920': 'posters/horror/1920.jpg',
+  'movie|bhoot': 'posters/horror/bhoot.jpg',
+  'movie|pari': 'posters/horror/pari.jpg',
+  'series|thehauntingofhillhouse': 'posters/horror/haunting-of-hill-house.jpg',
+  'series|thehauntingofblymanor': 'posters/horror/haunting-of-bly-manor.jpg',
+  'series|americanhorrorstory': 'posters/horror/american-horror-story.jpg',
+  'series|ghoul': 'posters/horror/ghoul.jpg',
+  'series|typewriter': 'posters/horror/typewriter.jpg',
 };
 
 async function getActiveSubscription(userId) {

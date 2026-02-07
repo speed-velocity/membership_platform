@@ -70,11 +70,30 @@ const COMEDY_RECOMMENDATIONS = [
   { title: 'TVF Pitchers', kind: 'Series', posterPath: 'posters/comedy/tvf-pitchers.jpg' },
 ];
 
+const HORROR_RECOMMENDATIONS = [
+  { title: 'The Conjuring', kind: 'Movie', posterPath: 'posters/horror/the-conjuring.jpg' },
+  { title: 'Insidious', kind: 'Movie', posterPath: 'posters/horror/insidious.jpg' },
+  { title: 'Sinister', kind: 'Movie', posterPath: 'posters/horror/sinister.jpg' },
+  { title: 'Hereditary', kind: 'Movie', posterPath: 'posters/horror/hereditary.jpg' },
+  { title: 'IT', kind: 'Movie', posterPath: 'posters/horror/it.jpg' },
+  { title: 'Tumbbad', kind: 'Movie', posterPath: 'posters/horror/tumbbad.jpg' },
+  { title: 'Stree', kind: 'Movie', posterPath: 'posters/horror/stree.jpg' },
+  { title: '1920', kind: 'Movie', posterPath: 'posters/horror/1920.jpg' },
+  { title: 'Bhoot', kind: 'Movie', posterPath: 'posters/horror/bhoot.jpg' },
+  { title: 'Pari', kind: 'Movie', posterPath: 'posters/horror/pari.jpg' },
+  { title: 'The Haunting of Hill House', kind: 'Series', posterPath: 'posters/horror/haunting-of-hill-house.jpg' },
+  { title: 'The Haunting of Bly Manor', kind: 'Series', posterPath: 'posters/horror/haunting-of-bly-manor.jpg' },
+  { title: 'American Horror Story', kind: 'Series', posterPath: 'posters/horror/american-horror-story.jpg' },
+  { title: 'Ghoul', kind: 'Series', posterPath: 'posters/horror/ghoul.jpg' },
+  { title: 'Typewriter', kind: 'Series', posterPath: 'posters/horror/typewriter.jpg' },
+];
+
 const GENRE_RECOMMENDATIONS = [
   { genre: 'Action', items: ACTION_RECOMMENDATIONS },
   { genre: 'Romance', items: ROMANCE_RECOMMENDATIONS },
   { genre: 'Thriller', items: THRILLER_RECOMMENDATIONS },
   { genre: 'Comedy', items: COMEDY_RECOMMENDATIONS },
+  { genre: 'Horror', items: HORROR_RECOMMENDATIONS },
 ];
 
 function normalizeTitle(value) {
