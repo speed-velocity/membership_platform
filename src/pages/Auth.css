@@ -50,11 +50,16 @@
 
 .poster-wall {
   position: absolute;
-  inset: 0;
+  left: 50%;
+  top: 50%;
+  width: 100vw;
+  height: 100vh;
+  transform: translate(-50%, -50%);
   display: grid;
   grid-template-columns: repeat(7, minmax(120px, 1fr));
   gap: 18px;
-  padding: 6vh 8vw;
+  padding: 6vh 6vw;
+  box-sizing: border-box;
   opacity: 0.55;
   z-index: 1;
   pointer-events: none;
