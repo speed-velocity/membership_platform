@@ -7,12 +7,15 @@ const API = '/api';
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const allowedGenres = new Set(['Romance', 'Action', 'Thriller', 'Comedy', 'Horror']);
 
   const normalizeUser = (u) => {
     if (!u) return u;
+    const rawGenre = u.favoriteGenre ?? u.favorite_genre ?? null;
+    const favoriteGenre = rawGenre && allowedGenres.has(rawGenre) ? rawGenre : null;
     return {
       ...u,
-      favoriteGenre: u.favoriteGenre ?? u.favorite_genre ?? null,
+      favoriteGenre,
     };
   };
 
