@@ -10,6 +10,7 @@ export default function Layout() {
   const [avatarMenuOpen, setAvatarMenuOpen] = React.useState(false);
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
+  const avatarSrc = user?.avatarUrl ? `/${user.avatarUrl}` : null;
 
   const closeMenu = () => {
     setMenuOpen(false);
@@ -74,6 +75,17 @@ export default function Layout() {
           </button>
         </div>
         <div className="side-panel-body">
+          {user?.role === 'user' && (
+            <div className="avatar-current">
+              <div className="avatar-thumb">
+                {avatarSrc ? <img src={avatarSrc} alt="Profile" /> : <span>?</span>}
+              </div>
+              <div>
+                <div className="avatar-label">Profile photo</div>
+                <div className="avatar-hint">Update below</div>
+              </div>
+            </div>
+          )}
           {user?.role === 'user' && (
             <button
               className="btn-glow btn-secondary btn-sm"
